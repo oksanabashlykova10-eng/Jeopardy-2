@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeopardy Game Editor by English Bootcamp</title>
+    <title>Jeopardy Game Editor</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
     
@@ -197,7 +197,7 @@
         <div id="editor-ui">
             <div class="editor-header">
                 <img src="https://img.genially.com/67961b32a116fb001568a75e/673752a5-8d4d-40d1-9b5f-f04ebd91a27c.png" class="logo-img" alt="Logo">
-                <span>Jeopardy Game Editor by English Bootcamp</span>
+                <span>Jeopardy Game Editor</span>
             </div>
             
             <div class="editor-tabs">
@@ -381,32 +381,26 @@
                 <div id="tab-export" class="ed-pane">
                     <h3>Экспорт игры</h3>
                     <div class="form-group">
-                        <label style="color:#e91e63; font-size:1rem;">Ссылка на вашу игру (базовый URL на GitHub):</label>
-                        <input type="text" id="ed-base-game-url" value="https://oksanabashlykova10-eng.github.io/Jeopardy-1/" placeholder="Вставьте ссылку на игру...">
-                        <p style="font-size:0.75rem; color:#666; margin-top:0;">*Редактор прикрепит настройки именно к этому адресу.</p>
+                        <label style="color:#000; font-weight:bold; font-size:1rem;">Ссылка для сборки (базовый URL):</label>
+                        <input type="text" id="ed-base-game-url" value="https://oksanabashlykova10-eng.github.io/Jeopardy-2/" placeholder="Вставьте ссылку на игру...">
                     </div>
 
-                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД</button>
+                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД</button>
                     
-                    <div id="export-result" style="display:none; margin-top:20px;">
+                    <div id="export-result" style="display:none;">
                         
-                        <label style="display:block; margin-bottom:5px; color:#00bcd4; font-weight:bold;">1. Iframe с МАСКИРОВКОЙ (рекомендуется для Genially):</label>
-                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Никто не увидит ваш логин GitHub в коде вставки.</p>
-                        <div class="flex-row">
-                            <textarea id="out-iframe-obf" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                            <button onclick="copyCode('out-iframe-obf', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
-                        </div>
-
-                        <label style="display:block; margin-top:15px; margin-bottom:5px;">2. Прямой Iframe (запасной вариант):</label>
-                        <div class="flex-row">
-                            <textarea id="out-iframe-direct" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                            <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
+                        <label style="display:block; margin-bottom:5px; font-weight:bold;">1. Код для вставки (Iframe):</label>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте для интеграции в Genially или другие платформы.</p>
+                        <div class="flex-row" style="margin-bottom: 20px;">
+                            <textarea id="out-iframe-direct" rows="3" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
                         </div>
                         
-                        <label style="display:block; margin-top:15px; margin-bottom:5px;">3. Чистый HTML (Для отдельного сайта):</label>
+                        <label style="display:block; margin-bottom:5px; font-weight:bold;">2. Чистый HTML-код (Для сайта):</label>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Полный исходный код игры в одном файле.</p>
                         <div class="flex-row">
-                            <textarea id="out-html" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                            <button onclick="copyCode('out-html', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
+                            <textarea id="out-html" rows="3" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <button onclick="copyCode('out-html', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
                         </div>
                     </div>
                 </div>
@@ -463,16 +457,10 @@
                 </div>
 
                 <div id="final-screen">
-                    <!-- ИНТЕРАКТИВНЫЙ ТРИГГЕР ЗВУКА ФИНАЛА -->
-                    <button id="final-trigger-btn" class="btn-start" onclick="showFinalResults()" style="font-size: 2.5rem; animation: pulse 1.5s infinite; border-color: var(--points-color); color: var(--points-color); z-index: 310;">🏆 УЗНАТЬ ПОБЕДИТЕЛЯ 🏆</button>
-                    
-                    <!-- РЕАЛЬНЫЙ ФИНАЛ (скрыт до клика) -->
-                    <div id="final-content-wrapper" style="display:none; flex-direction:column; align-items:center; width:100%; z-index: 305;">
-                        <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
-                        <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
-                        <img id="reward-image" src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80">
-                        <div class="underlay-box" id="leaderboard"></div>
-                    </div>
+                    <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
+                    <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
+                    <img id="reward-image" src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80">
+                    <div class="underlay-box" id="leaderboard"></div>
                 </div>
 
                 <div class="game-controls" id="in-game-controls">
@@ -634,10 +622,15 @@
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
             
+            // Жесткая инициализация звуков при первом клике (старте игры)
             audioPlayers['click'] = new Audio(gameConfig.sounds.click);
             audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
             audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
             audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
+            
+            for(let key in audioPlayers) {
+                audioPlayers[key].load();
+            }
 
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
             document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
@@ -651,11 +644,7 @@
             if(mode === 'start') document.getElementById('start-screen').style.display = 'flex';
             if(mode === 'game') { document.getElementById('game-screen').style.display = 'flex'; buildBoard(); buildTeams(); }
             if(mode === 'question') { document.getElementById('question-modal').style.display = 'flex'; showMockModalForTab(); }
-            if(mode === 'final') { 
-                document.getElementById('final-screen').style.display = 'flex'; 
-                document.getElementById('final-trigger-btn').style.display = 'block';
-                document.getElementById('final-content-wrapper').style.display = 'none';
-            }
+            if(mode === 'final') { document.getElementById('final-screen').style.display = 'flex'; }
         }
 
         function copyCode(id, btnElement) {
@@ -908,10 +897,9 @@
             document.querySelectorAll('.pr-tab-btn').forEach(b => b.classList.remove('active'));
             const finalTab = Array.from(document.querySelectorAll('.pr-tab-btn')).find(b => b.innerText.includes('Финал')); if(finalTab) finalTab.classList.add('active');
 
-            // Показываем экран финала, но только триггерную кнопку
+            // ПОКАЗЫВАЕМ ФИНАЛ И СРАЗУ ИГРАЕМ ЗВУК
             document.getElementById('final-screen').style.display = 'flex'; 
-            document.getElementById('final-trigger-btn').style.display = 'block';
-            document.getElementById('final-content-wrapper').style.display = 'none';
+            playSound('fanfare');
             
             document.getElementById('reward-image').src = gameConfig.cupImg;
 
@@ -933,19 +921,12 @@
             }
         }
 
-        // Эта функция вызывается при клике на кнопку УЗНАТЬ ПОБЕДИТЕЛЯ
-        function showFinalResults() {
-            playSound('fanfare');
-            document.getElementById('final-trigger-btn').style.display = 'none';
-            document.getElementById('final-content-wrapper').style.display = 'flex';
-        }
 
         // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА ---
         function generateGameCode() {
             const configStr = JSON.stringify(gameConfig);
             const base64Config = btoa(unescape(encodeURIComponent(configStr)));
             
-            // 1. Берем базовую ссылку, которую ввел пользователь, и прикрепляем конфиг
             let baseUrl = document.getElementById('ed-base-game-url').value.trim();
             if (!baseUrl) { alert("Пожалуйста, введите ссылку на игру (базовый URL)!"); return; }
             if (!baseUrl.endsWith('/') && !baseUrl.includes('?')) baseUrl += '/';
@@ -953,18 +934,10 @@
             
             const fullDirectUrl = baseUrl + base64Config;
             
-            // 2. Генерируем ПРЯМОЙ Iframe
-            const iframeDirectCode = `<iframe src="${fullDirectUrl}" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-            
-            // 3. Генерируем ЗАМАСКИРОВАННЫЙ Iframe (Обфускация)
-            // Создаем мини-HTML страницу, которая скриптом расшифровывает URL и перенаправляет на него. 
-            // Сама эта мини-страница кодируется в Base64.
-            const redirectScript = `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;color:#fff;font-family:sans-serif;">Loading...<script>window.location.replace(decodeURIComponent(escape(atob('${btoa(unescape(encodeURIComponent(fullDirectUrl)))}'))));<\/script></body></html>`;
-            const obfUrl = "data:text/html;base64," + btoa(unescape(encodeURIComponent(redirectScript)));
-            
-            const iframeObfCode = `<iframe src="${obfUrl}" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            // 1. Генерируем ПРЯМОЙ Iframe
+            const iframeDirectCode = `<iframe src="${fullDirectUrl}" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
 
-            // 4. Формируем чистый HTML код (только игра)
+            // 2. Формируем чистый HTML код (только игра)
             let rootStyles = `:root {
                 --font-main: ${gameConfig.style.fontMain}; --font-title: ${gameConfig.style.fontTitle};
                 --text-color: ${gameConfig.style.textColor}; --title-color: ${gameConfig.style.titleColor};
@@ -1077,13 +1050,10 @@
             </div>
         </div>
         <div id="final-screen">
-            <button id="final-trigger-btn" class="btn-start" onclick="showFinalResults()" style="font-size: 2.5rem; animation: pulse 1.5s infinite; border-color: var(--points-color); color: var(--points-color); z-index: 310;">🏆 УЗНАТЬ ПОБЕДИТЕЛЯ 🏆</button>
-            <div id="final-content-wrapper" style="display:none; flex-direction:column; align-items:center; width:100%; z-index: 305;">
-                <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
-                <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
-                <img id="reward-image" src="${gameConfig.cupImg}">
-                <div class="underlay-box" id="leaderboard"></div>
-            </div>
+            <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
+            <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
+            <img id="reward-image" src="${gameConfig.cupImg}">
+            <div class="underlay-box" id="leaderboard"></div>
         </div>
         <div class="game-controls" id="in-game-controls">
             <button class="btn-control btn-restart" onclick="location.reload()">↺ Заново</button>
@@ -1111,6 +1081,10 @@
             audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
             audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
             audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
+            
+            for(let key in audioPlayers) {
+                audioPlayers[key].load();
+            }
 
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
             document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
@@ -1247,8 +1221,7 @@
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
             
             document.getElementById('final-screen').style.display = 'flex'; 
-            document.getElementById('final-trigger-btn').style.display = 'block';
-            document.getElementById('final-content-wrapper').style.display = 'none';
+            playSound('fanfare');
             
             let results = [];
             for (let i = 0; i < gameConfig.teams; i++) { results.push({ id: i, name: \`Team \${i + 1}\`, score: scores[i], avatar: (!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? \`<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">\${gameConfig.avatars[i]}</div>\` : \`<img src="\${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">\` }); }
@@ -1262,12 +1235,6 @@
             results.forEach((team, index) => { lbContainer.innerHTML += \`<div class="leaderboard-row"><div>#\${index + 1}</div><div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; overflow:hidden;">\${team.avatar}</div> \${team.name}</div><div style="color:var(--points-color); font-weight:bold;">\${team.score}</div></div>\`; });
         }
 
-        function showFinalResults() {
-            playSound('fanfare');
-            document.getElementById('final-trigger-btn').style.display = 'none';
-            document.getElementById('final-content-wrapper').style.display = 'flex';
-        }
-
         // Защита от правого клика
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
@@ -1279,7 +1246,6 @@
 
             document.getElementById('out-html').value = fullHTML;
             document.getElementById('out-iframe-direct').value = iframeDirectCode;
-            document.getElementById('out-iframe-obf').value = iframeObfCode;
             document.getElementById('export-result').style.display = 'block';
         }
 
