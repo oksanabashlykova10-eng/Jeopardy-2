@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeopardy Game Editor by English Bootcamp</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-main: 'Exo 2', sans-serif;
+            --font-title: 'Orbitron', sans-serif;
+            --text-color: #ffffff;
+            --title-color: #ffffff;
+            --base-font-size: 1.2rem;
+            --title-font-scale: 1; 
+            --title-font-size: 4rem; 
+            
+            --points-color: #ffd700;
+            --correct-color: #00ff00;
+            --wrong-color: #ff0044;
+            --neon-intensity: 15px;
+            --neon-border: 2px;
+            
+            --bg-start-img: url('https://img.genially.com/67961b32a116fb001568a75e/c5fddf17-7bd2-4683-96cf-a67922a34088.png');
+            --bg-game-board: #0a0a2a;
+            --bg-modal-img: url('https://img.genially.com/67961b32a116fb001568a75e/168003a7-5b35-41b1-92f9-72c3ded83663.png');
+            --modal-overlay-opacity: 0.6;
+            --modal-box-bg: rgba(10, 10, 42, 1);
+            
+            --underlay-bg: rgba(0, 0, 0, 0.5);
+            --underlay-neon: #00ffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #111; }
+        
+        .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        #app-container { display: flex; width: 100%; height: 100%; }
+        
+        /* РЕДАКТОР */
+        #editor-ui { width: 32%; min-width: 450px; display: flex; flex-direction: column; background: #f4f4f9; color: #333; box-shadow: 5px 0 15px rgba(0,0,0,0.5); z-index: 10; border-right: 2px solid #ccc; position: relative;}
+        
+        .editor-header { display: flex; align-items: center; gap: 15px; background: #2c3e50; color: #00ffff; padding: 15px; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #00ffff;}
+        .logo-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00ffff; box-shadow: 0 0 10px #00ffff; object-fit: cover;}
+        
+        .editor-footer { text-align: center; padding: 10px; font-size: 0.85rem; color: #555; border-top: 1px solid #ccc; background: #e0e0e0; font-weight: bold; }
+
+        .editor-tabs { display: flex; flex-wrap: wrap; background: #34495e; }
+        .ed-tab-btn { flex-grow: 1; padding: 10px; background: none; border: none; color: #ccc; cursor: pointer; transition: 0.3s; font-size: 0.85rem; border-bottom: 3px solid transparent; }
+        .ed-tab-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        .ed-tab-btn.active { color: #00ffff; border-bottom-color: #00ffff; font-weight: bold; background: rgba(0,255,255,0.1); }
+        
+        .editor-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
+        .ed-pane { display: none; }
+        .ed-pane.active { display: block; animation: fadeIn 0.3s ease; }
+        
+        h3 { margin: 25px 0 10px 0; color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 5px; font-size: 1.1rem; }
+        h3:first-child { margin-top: 0; }
+        .form-group { background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; font-family: inherit; }
+        input[type="color"] { cursor: pointer; border: none; width: 40px; height: 30px; padding: 0; background: none; }
+        input[type="range"] { width: 100%; margin-bottom: 10px; }
+        input[type="file"] { margin-bottom: 5px; font-size: 0.8rem; }
+        textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 5px; font-family: inherit; resize: vertical; min-height: 50px;}
+        
+        .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .flex-row input[type="text"], .flex-row input[type="number"], .flex-row label { margin-bottom: 0; }
+        
+        .radio-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.9rem; font-weight: bold; }
+        .radio-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; margin-bottom:0;}
+        .radio-group input { width: auto; margin: 0; cursor: pointer;}
+
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .preset-item { height: 60px; border-radius: 5px; border: 2px solid #ddd; cursor: pointer; background-size: cover; background-position: center; transition: 0.2s; position: relative;}
+        .preset-item:hover { transform: scale(1.05); }
+        .preset-item.active { border-color: #00ffff; box-shadow: 0 0 10px #00ffff; }
+        .preset-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.65rem; text-align: center; padding: 3px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;}
+
+        .question-block { border: 2px solid #34495e; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fafafa; }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #2c3e50; padding-bottom: 5px;}
+        .question-header span { font-weight: bold; font-size: 1.3rem; color: #2c3e50; font-family: 'Orbitron', sans-serif;}
+        .cat-q-wrap { margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #ccc; }
+        .cat-q-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; }
+        
+        .smart-hint { background:#e3f2fd; padding:10px; border-radius:5px; margin-bottom:15px; font-size:0.85rem; color:#0d47a1; border-left: 4px solid #2196f3;}
+        .smart-hint code { background:#fff; padding:2px 5px; border-radius:3px; font-weight:bold;}
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ПРЕДПРОСМОТР / ИГРА */
+        #preview-area { width: 68%; display: flex; flex-direction: column; background: #000; position: relative;}
+        
+        #preview-tabs { display: flex; align-items: center; flex-wrap: wrap; background: #222; padding: 10px 20px; gap: 10px; border-bottom: 1px solid #444; z-index: 10; }
+        .pr-tab-btn { background: #333; color: #aaa; border: 1px solid #555; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-family: 'Exo 2', sans-serif; font-weight: bold; transition: 0.3s; font-size: 0.85rem;}
+        .pr-tab-btn:hover { background: #444; color: #fff; }
+        .pr-tab-btn.active { background: #00ffff; color: #000; border-color: #00ffff; box-shadow: 0 0 10px rgba(0,255,255,0.5); }
+        
+        .btn-test-game { background: #4caf50; color: #fff; border: 2px solid #fff; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; margin-left: auto; transition: 0.3s; text-transform: uppercase;}
+        .btn-test-game:hover { background: #45a049; box-shadow: 0 0 15px #4caf50; transform: scale(1.05);}
+        .btn-test-game.active-test { background: #f44336; box-shadow: 0 0 15px #f44336; }
+
+        #play-mode { flex-grow: 1; position: relative; color: var(--text-color); font-family: var(--font-main); font-size: var(--base-font-size); overflow: hidden; background: #000;}
+        
+        .game-controls { position: absolute; top: 15px; right: 15px; display: none; gap: 10px; z-index: 250; }
+        .btn-control { background: rgba(0,0,0,0.6); color: var(--text-color); border: 1px solid #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-family: var(--font-main); transition: 0.3s; backdrop-filter: blur(5px);}
+        .btn-control:hover { background: #fff; color: #000; }
+        
+        .underlay-box { background: var(--underlay-bg); border: var(--neon-border) solid var(--underlay-neon); box-shadow: 0 0 var(--neon-intensity) var(--underlay-neon); border-radius: 15px; padding: 20px; backdrop-filter: blur(5px); }
+        .dragger-resizer { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; cursor: se-resize; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.8) 50%); border-bottom-right-radius: 10px; z-index: 10; }
+
+        /* Экран 1: Стартовый */
+        #start-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background-image: var(--bg-start-img); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        #drag-title-container { position: absolute; cursor: grab; padding: 15px 30px; display: inline-block; min-width: 200px; text-align: center; z-index: 110;}
+        #drag-title-container:active { cursor: grabbing; }
+        .game-title { font-family: var(--font-title); font-size: var(--title-font-size); font-weight: 900; text-transform: uppercase; color: var(--title-color); text-shadow: 0 0 var(--neon-intensity) #fff; margin: 0; line-height: 1.1; user-select: none;}
+        
+        #drag-team-container { position: absolute; cursor: grab; display: flex; flex-direction: column; align-items: center; gap: 1rem; z-index: 110; padding: 30px;}
+        #drag-team-container:active { cursor: grabbing; }
+        .team-selection select { font-family: var(--font-main); font-size: 1.2em; padding: 0.5rem 1rem; border-radius: 8px; color: #000; }
+        .btn-start { font-family: var(--font-title); font-size: 1.8em; padding: 1rem 3rem; background: transparent; color: var(--title-color); border: 2px solid var(--title-color); border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        .btn-start:hover { background: #fff; color: #000; box-shadow: 0 0 var(--neon-intensity) #fff; transform: scale(1.05); }
+
+        /* Экран 2: Поле */
+        #game-screen { display: none; width: 100%; height: 100%; flex-direction: column; padding: 15px; position: relative; background: var(--bg-game-board); }
+        #jeopardy-board { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto repeat(5, 1fr); gap: 10px; flex-grow: 1; margin-bottom: 15px; margin-top: 20px; }
+        
+        .category-cell { background: var(--col-color); color: var(--title-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 5px; font-family: var(--font-title); font-size: calc(1.5rem * var(--title-font-scale)); font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: var(--neon-border) solid rgba(255,255,255,0.3); }
+        .question-cell { background: var(--col-color-transparent); border: var(--neon-border) solid var(--col-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: calc(2.5rem * var(--title-font-scale)); font-weight: 900; color: var(--points-color); cursor: pointer; transition: all 0.2s; text-shadow: 1px 1px 2px #000; }
+        .question-cell:hover { background: var(--col-color); box-shadow: 0 0 var(--neon-intensity) var(--col-color); color: #fff; transform: translateY(-2px); }
+        .question-cell.disabled { opacity: 0.15; pointer-events: none; filter: grayscale(80%); }
+
+        #teams-panel { display: flex; justify-content: space-evenly; align-items: center; height: 80px; }
+        .team-card { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); padding: 5px 15px 5px 5px; border-radius: 40px; border: 1px solid transparent; transition: 0.3s; opacity: 0.8; }
+        .team-card.active { border-color: #fff; box-shadow: 0 0 var(--neon-intensity) rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.2); opacity: 1; }
+        .team-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #222; border: 2px solid #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .team-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .team-info { display: flex; flex-direction: column; }
+        .team-score { font-family: var(--font-title); font-size: 1.5rem; font-weight: bold; color: var(--points-color); }
+
+        /* Экран 3: Модалка Вопроса */
+        #question-modal { 
+            position: absolute; inset: 0; display: none; justify-content: center; align-items: center; z-index: 200; 
+            background-image: var(--bg-modal-img); background-size: cover; background-position: center; background-repeat: no-repeat;
+            flex-direction: column;
+        }
+        #question-modal::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,var(--modal-overlay-opacity)); z-index: 0; }
+        
+        .modal-content { 
+            background: var(--modal-box-bg); border: var(--neon-border) solid var(--col-color, #fff); border-radius: 15px; padding: 40px; 
+            width: 90%; max-width: 800px; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1;
+        }
+
+        .modal-header { font-family: var(--font-title); font-size: calc(1.2rem * var(--title-font-scale)); color: var(--points-color); margin-bottom: 15px; }
+        .modal-task-text { font-size: 1.5em; margin-bottom: 20px; font-weight: 600; text-shadow: 1px 1px 3px #000; color: var(--text-color);}
+        
+        .media-container img { max-width: 100%; max-height: 250px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #555; }
+        .media-container audio { margin-bottom: 15px; width: 80%; }
+        
+        .choice-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-choice { background: rgba(0,0,0,0.5); color: var(--text-color); border: 1px solid #aaa; border-radius: 8px; padding: 12px 25px; font-size: 1em; font-family: var(--font-main); cursor: pointer; transition: 0.2s;}
+        .btn-choice:hover { border-color: #fff; box-shadow: 0 0 10px #fff; background: rgba(255,255,255,0.2); }
+        .btn-choice.correct { border-color: var(--correct-color); background: rgba(0,255,0,0.2); box-shadow: 0 0 15px var(--correct-color); }
+        .btn-choice.wrong { border-color: var(--wrong-color); background: rgba(255,0,0,0.2); box-shadow: 0 0 15px var(--wrong-color); }
+        
+        .input-field { font-size: 1.5em; padding: 10px; text-align: center; border-radius: 8px; border: 2px solid #555; background: #222; color: #fff; font-family: var(--font-main); transition: 0.3s;}
+        .btn-submit { margin-top: 20px; padding: 10px 30px; font-size: 1em; font-family: var(--font-title); background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; }
+        
+        .answer-line { display: flex; gap: 10px; min-height: 60px; padding: 10px; border-bottom: 2px solid #fff; justify-content: center; margin-bottom: 15px; align-items: center; flex-wrap: wrap;}
+        .word-pool { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .word-chip { background: #222; border: 1px solid transparent; outline: 1px solid #555; padding: 10px 15px; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: 0.3s; user-select: none;}
+        .word-chip:hover { outline-color: var(--col-color, #0ff); box-shadow: 0 0 10px var(--col-color, #0ff); }
+        .answer-line .word-chip { background: var(--col-color, #0ff); color: #000; outline: none; box-shadow: 0 0 15px var(--col-color, #0ff); font-weight: bold; }
+
+        #result-overlay { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; }
+
+        .btn-next-arrow { margin-top: 25px; padding: 12px 35px; font-size: 1.5rem; font-family: var(--font-title); background: #000; color: #0ff; border: 2px solid #0ff; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px #0ff; text-transform: uppercase; animation: pulse 1.5s infinite; position: relative; z-index: 5; }
+        .btn-next-arrow:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* Экран 4: Финал */
+        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
+        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center;}
+        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; }
+        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color);}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color);}
+    </style>
+</head>
+<body id="body-tag">
+
+    <div id="app-container">
+        <!-- ЛЕВАЯ ЧАСТЬ: РЕДАКТОР -->
+        <div id="editor-ui">
+            <div class="editor-header">
+                <img src="https://img.genially.com/67961b32a116fb001568a75e/673752a5-8d4d-40d1-9b5f-f04ebd91a27c.png" class="logo-img" alt="Logo">
+                <span>Jeopardy Game Editor by English Bootcamp</span>
+            </div>
+            
+            <div class="editor-tabs">
+                <button class="ed-tab-btn active" onclick="switchEdTab('tab-start', this)">Заставка</button>
+                <button class="ed-tab-btn" onclick="switchEdTab('tab-board', this)">Поле</button>
+                <button class="ed-tab-btn" onclick="switchEdTab('tab-questions', this)">Вопросы</button>
+                <button class="ed-tab-btn" onclick="switchEdTab('tab-media', this)">Медиа</button>
+                <button class="ed-tab-btn" onclick="switchEdTab('tab-design', this)">Шрифты</button>
+                <button class="ed-tab-btn" style="background:#00bcd4; color:#000;" onclick="switchEdTab('tab-export', this)">Экспорт</button>
+            </div>
+            
+            <div class="editor-content">
+                <!-- Вкладка: Заставка -->
+                <div id="tab-start" class="ed-pane active">
+                    <h3>Фон заставки</h3>
+                    <div class="preset-grid" id="preset-grid-start"></div>
+                    <div class="form-group">
+                        <label>Свой фон (URL/Файл)</label>
+                        <input type="text" placeholder="https://..." onchange="updateBg('start', this.value, true)">
+                        <input type="file" accept="image/*" onchange="handleFile(this, val => updateBg('start', val, true))">
+                    </div>
+                    <h3>Название игры</h3>
+                    <div class="form-group">
+                        <input type="text" id="ed-title-text" value="Geopardy" oninput="document.getElementById('drag-title-text').innerText = this.value; gameConfig.title = this.value;">
+                        <p style="font-size: 0.75rem; color: #666;">* Перемещайте заголовок и панель команд мышкой. Тяните за правый нижний угол, чтобы изменить размер.</p>
+                    </div>
+                    <h3>Подложки (Заголовок, панель)</h3>
+                    <div class="form-group">
+                        <label>Цвет подложки</label>
+                        <div class="flex-row">
+                            <input type="color" id="ed-ul-color" value="#000000" onchange="updateUnderlay()"><input type="text" id="ed-ul-hex" value="#000000" disabled>
+                        </div>
+                        <label>Прозрачность (%)</label>
+                        <input type="range" id="ed-ul-opacity" min="0" max="100" value="50" oninput="updateUnderlay()">
+                        <label>Цвет неона (рамка)</label>
+                        <input type="color" id="ed-ul-neon" value="#00ffff" onchange="updateUnderlay()">
+                    </div>
+                </div>
+
+                <!-- Вкладка: Игровое поле -->
+                <div id="tab-board" class="ed-pane">
+                    <h3>Фон Игрового поля (Сетка)</h3>
+                    <div class="form-group">
+                        <div class="radio-group">
+                            <label><input type="radio" name="bg_type" id="bg-type-solid" checked onchange="toggleBgType()"> Однотонный</label>
+                            <label><input type="radio" name="bg_type" id="bg-type-gradient" onchange="toggleBgType()"> Градиент</label>
+                        </div>
+                        <div id="bg-solid-wrap" class="flex-row" style="margin-top: 10px;">
+                            <input type="color" id="ed-bg-solid" value="#0a0a2a" onchange="applyGameBoardBg()"><span style="font-size: 0.8rem;">Выберите цвет</span>
+                        </div>
+                        <div id="bg-gradient-wrap" class="flex-row" style="display:none; margin-top: 10px;">
+                            <input type="color" id="ed-bg-grad-1" value="#0f2027" onchange="applyGameBoardBg()"><input type="color" id="ed-bg-grad-2" value="#2c5364" onchange="applyGameBoardBg()"><span style="font-size: 0.8rem;">Два цвета</span>
+                        </div>
+                    </div>
+                    <h3>Настройка Экрана Вопроса</h3>
+                    <div class="preset-grid" id="preset-grid-modal"></div>
+                    <div class="form-group">
+                        <label>Свой фон (URL/Файл)</label>
+                        <input type="text" placeholder="URL картинки..." onchange="updateBg('modal', this.value, true)">
+                        <label style="margin-top: 15px;">Затемнение фона (0 - 100%)</label>
+                        <input type="range" min="0" max="100" value="60" oninput="gameConfig.style.modalOverlayOpacity = this.value / 100; applyConfigStyles();">
+                        <label style="margin-top: 15px;">Цвет самой плашки (рамки) вопроса</label>
+                        <div class="flex-row">
+                            <input type="color" id="ed-modal-box-color" value="#0a0a2a" onchange="updateModalBox()"><span style="font-size: 0.8rem;">Выбор цвета</span>
+                        </div>
+                        <label>Непрозрачность плашки (0 - 100%)</label>
+                        <input type="range" id="ed-modal-box-opacity" min="0" max="100" value="100" oninput="updateModalBox()">
+                    </div>
+                    <h3>Стоимость вопросов</h3>
+                    <div class="form-group">
+                        <div class="flex-row"><label>Стр. 1:</label><input type="number" id="ed-pt-0" value="100" onchange="updatePoints()"><label>Стр. 2:</label><input type="number" id="ed-pt-1" value="200" onchange="updatePoints()"></div>
+                        <div class="flex-row"><label>Стр. 3:</label><input type="number" id="ed-pt-2" value="300" onchange="updatePoints()"><label>Стр. 4:</label><input type="number" id="ed-pt-3" value="400" onchange="updatePoints()"></div>
+                        <div class="flex-row"><label>Стр. 5:</label><input type="number" id="ed-pt-4" value="500" onchange="updatePoints()"></div>
+                    </div>
+                    <h3>Категории и Цвета столбцов</h3>
+                    <div class="form-group" id="ed-categories-box"></div>
+                </div>
+
+                <!-- Вкладка: ВОПРОСЫ -->
+                <div id="tab-questions" class="ed-pane">
+                    <h3>Редактор вопросов</h3>
+                    <div class="smart-hint">
+                        <b>Правила для текста (редактор сам поймет формат):</b><br>
+                        1. Выбор ответа (разделитель | ): <br><code>I ___ tired. | am | is | are</code> (первый ответ - верный)<br>
+                        2. Вписать слово (ответы в скобках, можно через запятую): <br><code>___ is the capital (London, LONDON)</code><br>
+                        3. Собрать предложение (просто текст): <br><code>The Maya were great astronomers.</code>
+                    </div>
+                    <div id="questions-editor-container"></div>
+                </div>
+
+                <!-- Вкладка: Медиа -->
+                <div id="tab-media" class="ed-pane">
+                    <h3>Аватарки команд</h3>
+                    <div class="form-group">
+                        <label>Стиль (Пресеты)</label>
+                        <select id="ed-avatar-theme" onchange="applyAvatarTheme(this.value)">
+                            <option value="animals">Животные (Эмодзи)</option>
+                            <option value="robots">Роботы (Техно)</option>
+                            <option value="monsters">Монстрики</option>
+                            <option value="xmas">Новый Год (Зима)</option>
+                            <option value="adventure">Приключения</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ed-avatars-box"></div>
+                    <h3>Награда Победителю (Кубок)</h3>
+                    <div class="form-group"><input type="text" id="ed-cup-url" placeholder="https://..." onchange="updateCup(this.value)"></div>
+                    <h3>Настройка звуков</h3>
+                    <div class="form-group">
+                        <label>Клик по карточке</label>
+                        <select id="ed-snd-click" onchange="updateConfigSounds()">
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3">Мягкий клик</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3">Щелчок</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3">Кнопка</option>
+                        </select>
+                        <label>Правильный ответ</label>
+                        <select id="ed-snd-correct" onchange="updateConfigSounds()">
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3">Колокольчик</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3">Магический успех</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3">Аркада победа</option>
+                        </select>
+                        <label>Неправильный ответ</label>
+                        <select id="ed-snd-wrong" onchange="updateConfigSounds()">
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3">Легкая ошибка</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3">Глухой стук</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/3112/3112-preview.mp3">Короткий Buzz</option>
+                        </select>
+                        <label>Финал (Победа)</label>
+                        <select id="ed-snd-fanfare" onchange="updateConfigSounds()">
+                            <option value="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3">Эпичная победа</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3">Торжественные фанфары</option>
+                            <option value="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3">Уровень пройден</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Вкладка: Шрифты -->
+                <div id="tab-design" class="ed-pane">
+                    <h3>Настройка текста (Вопросы, Кнопки)</h3>
+                    <div class="form-group">
+                        <label>Шрифт текста</label>
+                        <select id="ed-font-main" onchange="updateFonts()">
+                            <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Современный)</option>
+                            <option value="'Montserrat', sans-serif" style="font-family: 'Montserrat', sans-serif;">Montserrat (Классика)</option>
+                            <option value="'Roboto', sans-serif" style="font-family: 'Roboto', sans-serif;">Roboto (Строгий)</option>
+                            <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
+                            <option value="'Courier Prime', monospace" style="font-family: 'Courier Prime', monospace;">Courier Prime (Печатный)</option>
+                            <option value="'Orbitron', sans-serif" style="font-family: 'Orbitron', sans-serif;">Orbitron (Неон)</option>
+                            <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Узкий)</option>
+                            <option value="'Playfair Display', serif" style="font-family: 'Playfair Display', serif;">Playfair Display (Элегантный)</option>
+                            <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Маркер)</option>
+                        </select>
+                        <div class="flex-row" style="margin-top:10px;">
+                            <label style="width:40%;">Цвет текста:</label><input type="color" id="ed-text-color" value="#ffffff" onchange="updateFonts()">
+                        </div>
+                        <div class="flex-row">
+                            <label style="width:40%;">Размер текста:</label><input type="range" id="ed-text-size" min="0.8" max="2.5" step="0.1" value="1.2" oninput="updateFonts()">
+                        </div>
+                    </div>
+
+                    <h3>Настройка заголовков (Название, Цифры)</h3>
+                    <div class="form-group">
+                        <label>Шрифт заголовков</label>
+                        <select id="ed-font-title" onchange="updateFonts()">
+                            <option value="'Orbitron', sans-serif" style="font-family: 'Orbitron', sans-serif;">Orbitron (Неон)</option>
+                            <option value="'Bebas Neue', sans-serif" style="font-family: 'Bebas Neue', sans-serif;">Bebas Neue (Плакатный)</option>
+                            <option value="'Anton', sans-serif" style="font-family: 'Anton', sans-serif;">Anton (Жирный)</option>
+                            <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Узкий)</option>
+                            <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Современный)</option>
+                            <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
+                        </select>
+                        <div class="flex-row" style="margin-top:10px;">
+                            <label style="width:40%;">Цвет заголовков:</label><input type="color" id="ed-title-color" value="#ffffff" onchange="updateFonts()">
+                        </div>
+                        <div class="flex-row">
+                            <label style="width:40%;">Размер заголовков:</label><input type="range" id="ed-title-size" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateFonts()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка: ЭКСПОРТ ИГРЫ -->
+                <div id="tab-export" class="ed-pane">
+                    <h3>Экспорт игры</h3>
+                    <div class="form-group">
+                        <label style="color:#e91e63; font-size:1rem;">Ссылка на вашу игру (базовый URL на GitHub):</label>
+                        <input type="text" id="ed-base-game-url" value="https://oksanabashlykova10-eng.github.io/Jeopardy-1/" placeholder="Вставьте ссылку на игру...">
+                        <p style="font-size:0.75rem; color:#666; margin-top:0;">*Редактор прикрепит настройки именно к этому адресу.</p>
+                    </div>
+
+                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД</button>
+                    
+                    <div id="export-result" style="display:none; margin-top:20px;">
+                        
+                        <label style="display:block; margin-bottom:5px; color:#00bcd4; font-weight:bold;">1. Iframe с МАСКИРОВКОЙ (рекомендуется для Genially):</label>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Никто не увидит ваш логин GitHub в коде вставки.</p>
+                        <div class="flex-row">
+                            <textarea id="out-iframe-obf" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <button onclick="copyCode('out-iframe-obf', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
+                        </div>
+
+                        <label style="display:block; margin-top:15px; margin-bottom:5px;">2. Прямой Iframe (запасной вариант):</label>
+                        <div class="flex-row">
+                            <textarea id="out-iframe-direct" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
+                        </div>
+                        
+                        <label style="display:block; margin-top:15px; margin-bottom:5px;">3. Чистый HTML (Для отдельного сайта):</label>
+                        <div class="flex-row">
+                            <textarea id="out-html" rows="2" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <button onclick="copyCode('out-html', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s;">Копировать</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="editor-footer">
+                &copy; Все права принадлежат Башлыковой Оксане Михайловне, 2026
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ: ПРЕДПРОСМОТР ИГРЫ -->
+        <div id="preview-area">
+            
+            <div id="preview-tabs">
+                <span style="color:#aaa; font-size:0.8rem; margin-right:10px;">ЭКРАНЫ (ВИЗУАЛ):</span>
+                <button class="pr-tab-btn active" onclick="setPreviewMode('start', this)">Заставка</button>
+                <button class="pr-tab-btn" onclick="setPreviewMode('game', this)">Игровое поле</button>
+                <button class="pr-tab-btn" onclick="setPreviewMode('question', this)">Экран вопроса</button>
+                <button class="pr-tab-btn" onclick="setPreviewMode('final', this)">Финал</button>
+                
+                <button class="btn-test-game" id="btn-master-test" onclick="toggleTestMode()">▶ Тестировать игру</button>
+            </div>
+
+            <div id="play-mode">
+                <div id="start-screen">
+                    <div id="drag-title-container" class="underlay-box">
+                        <h1 class="game-title" id="drag-title-text">Geopardy</h1>
+                        <div id="title-resizer" class="dragger-resizer" title="Потяните для изменения размера"></div>
+                    </div>
+                    
+                    <div id="drag-team-container" class="team-selection underlay-box">
+                        <label for="team-count" style="color:var(--text-color);">Количество команд:</label>
+                        <select id="team-count">
+                            <option value="2">2 команды</option><option value="3">3 команды</option><option value="4" selected>4 команды</option>
+                        </select>
+                        <button class="btn-start" onclick="startGame()">Start</button>
+                        <div id="team-resizer" class="dragger-resizer" title="Потяните для изменения размера"></div>
+                    </div>
+                </div>
+
+                <div id="game-screen">
+                    <div id="jeopardy-board"></div>
+                    <div class="underlay-box" id="teams-panel"></div>
+                </div>
+
+                <div id="question-modal">
+                    <div class="modal-content" id="modal-content-box">
+                        <div id="result-overlay"></div>
+                        <div class="modal-header" id="modal-header-text">Category - Points</div>
+                        <div class="modal-task-text" id="modal-task-text">Task text</div>
+                        <div id="modal-interactive-area"></div>
+                    </div>
+                </div>
+
+                <div id="final-screen">
+                    <!-- ИНТЕРАКТИВНЫЙ ТРИГГЕР ЗВУКА ФИНАЛА -->
+                    <button id="final-trigger-btn" class="btn-start" onclick="showFinalResults()" style="font-size: 2.5rem; animation: pulse 1.5s infinite; border-color: var(--points-color); color: var(--points-color); z-index: 310;">🏆 УЗНАТЬ ПОБЕДИТЕЛЯ 🏆</button>
+                    
+                    <!-- РЕАЛЬНЫЙ ФИНАЛ (скрыт до клика) -->
+                    <div id="final-content-wrapper" style="display:none; flex-direction:column; align-items:center; width:100%; z-index: 305;">
+                        <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
+                        <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
+                        <img id="reward-image" src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80">
+                        <div class="underlay-box" id="leaderboard"></div>
+                    </div>
+                </div>
+
+                <div class="game-controls" id="in-game-controls">
+                    <button class="btn-control btn-restart" onclick="location.reload()">↺ Заново</button>
+                    <button class="btn-control btn-finish-early" onclick="forceEndGame()">🏁 Завершить игру</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isTestMode = false;
+        let gameConfig = {
+            title: "Geopardy", 
+            titleX: 0, titleY: -220, titleScale: 1, 
+            teamX: 0, teamY: 150, teamScale: 1, 
+            points: [100, 200, 300, 400, 500],
+            categories: ["Grammar", "Vocabulary", "Reading", "Speaking", "Bonus"],
+            colColors: ["#ff9800", "#4caf50", "#9c27b0", "#2196f3", "#f44336"],
+            avatars: ["🦊", "🐰", "🦁", "🐼"], 
+            cupImg: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80",
+            teams: 4,
+            sounds: { click: "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3", correct: "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3", wrong: "https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3", fanfare: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" },
+            questions: [],
+            bulkMode: [false, false, false, false, false], 
+            bulkText: ['', '', '', '', ''],
+            style: {
+                fontMain: "'Exo 2', sans-serif", fontTitle: "'Orbitron', sans-serif",
+                textColor: "#ffffff", titleColor: "#ffffff", baseFontSize: "1.2rem", titleFontScale: "1",
+                bgStartImg: "url('https://img.genially.com/67961b32a116fb001568a75e/c5fddf17-7bd2-4683-96cf-a67922a34088.png')",
+                bgGameBoard: "#0a0a2a", bgModalImg: "url('https://img.genially.com/67961b32a116fb001568a75e/168003a7-5b35-41b1-92f9-72c3ded83663.png')",
+                modalOverlayOpacity: "0.6", modalBoxBg: "rgba(10, 10, 42, 1)",
+                underlayBg: "rgba(0, 0, 0, 0.5)", underlayNeon: "#00ffff"
+            }
+        };
+
+        for(let c=0; c<5; c++) {
+            let catQuestions = [];
+            for(let r=0; r<5; r++) { catQuestions.push({ rawText: '', type: 'unscramble', text: `Вопрос за ${100 * (r+1)} баллов...`, hasMedia: false, mediaType: 'image', mediaUrl: '', options: [], correctAnswer: '' }); }
+            gameConfig.questions.push(catQuestions);
+        }
+
+        const presetLinksStart = [
+            { name: "Британия", url: "https://img.genially.com/67961b32a116fb001568a75e/c5fddf17-7bd2-4683-96cf-a67922a34088.png" },
+            { name: "Новый Год", url: "https://img.genially.com/67961b32a116fb001568a75e/f776e831-ebe9-4102-ae1b-75c488869359.png" },
+            { name: "География", url: "https://img.genially.com/67961b32a116fb001568a75e/1abe4a10-4482-4172-b00e-a1ed7236c5c9.png" },
+            { name: "Сокровища", url: "https://img.genially.com/67961b32a116fb001568a75e/fc491fa8-8e0d-4283-a254-c5781731278d.png" },
+            { name: "Универсал 1", url: "https://img.genially.com/67961b32a116fb001568a75e/c8bb5034-f090-482e-a9de-329b8e21ac99.png" },
+            { name: "Универсал 2", url: "https://img.genially.com/67961b32a116fb001568a75e/b4363e43-b622-407e-b0fa-8fc6716c0282.png" }
+        ];
+        const presetLinksModal = [
+            { name: "Британия", url: "https://img.genially.com/67961b32a116fb001568a75e/168003a7-5b35-41b1-92f9-72c3ded83663.png" },
+            { name: "Новый Год", url: "https://img.genially.com/67961b32a116fb001568a75e/46727f42-f061-440f-b09e-01c94b3c1b8f.png" },
+            { name: "География", url: "https://img.genially.com/67961b32a116fb001568a75e/39b78f4d-5b98-4927-a07f-5ff6f846aca8.png" },
+            { name: "Сокровища", url: "https://img.genially.com/67961b32a116fb001568a75e/27563162-a210-4efd-8b95-b426432b4d66.png" },
+            { name: "Универсал 1", url: "https://img.genially.com/67961b32a116fb001568a75e/cae6367b-4db3-4761-912c-7a5080701a44.png" },
+            { name: "Универсал 2", url: "https://img.genially.com/67961b32a116fb001568a75e/66fd3c13-ad93-4f69-8a6c-d6076da466f0.png" }
+        ];
+
+        let mockTypeIndex = 0; let scores = []; let currentTeamIndex = 0; let questionsAnswered = 0; const totalQuestions = 25; 
+        let activeCell = null; let currentPoints = 0; let currentActiveCol = 0; let currentActiveRow = 0; 
+        let audioPlayers = {}; 
+
+        // Инициализация "2-в-1"
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('config')) {
+                try {
+                    const configStr = decodeURIComponent(escape(atob(urlParams.get('config'))));
+                    gameConfig = JSON.parse(configStr);
+                    initGameOnlyMode();
+                } catch(e) { console.error("Config URL error", e); initEditorMode(); }
+            } else {
+                initEditorMode();
+            }
+        };
+
+        function initEditorMode() {
+            initPresets(); initCategoriesAndAvatars(); updateUnderlay(); applyConfigStyles(); buildBoard(); buildTeams(); initDraggableItems(); renderQuestionsForms();
+            document.getElementById('start-screen').style.display = 'flex'; document.getElementById('game-screen').style.display = 'none';
+        }
+
+        function initGameOnlyMode() {
+            document.getElementById('editor-ui').style.display = 'none';
+            document.getElementById('preview-tabs').style.display = 'none';
+            document.getElementById('preview-area').style.width = '100%';
+            
+            applyConfigStyles();
+            isTestMode = true; 
+            
+            document.getElementById('drag-title-container').style.transform = `translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale})`;
+            document.getElementById('drag-team-container').style.transform = `translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale})`;
+            document.getElementById('drag-title-text').innerText = gameConfig.title;
+            
+            document.getElementById('title-resizer').style.display = 'none';
+            document.getElementById('team-resizer').style.display = 'none';
+            
+            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('game-screen').style.display = 'none';
+        }
+
+        function playSound(type) { 
+            if (audioPlayers[type]) { 
+                audioPlayers[type].currentTime = 0;
+                audioPlayers[type].play().catch(e => console.log("Audio block by browser:", e)); 
+            } 
+        }
+
+        function initDraggableItems() {
+            makeDraggable('drag-title-container', 'title-resizer', 'titleX', 'titleY', 'titleScale');
+            makeDraggable('drag-team-container', 'team-resizer', 'teamX', 'teamY', 'teamScale');
+            document.getElementById('drag-title-container').style.transform = `translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale})`;
+            document.getElementById('drag-team-container').style.transform = `translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale})`;
+        }
+
+        function makeDraggable(containerId, resizerId, varX, varY, varScale) {
+            const el = document.getElementById(containerId); const res = document.getElementById(resizerId);
+            let isDragging = false, isResizing = false; let startX, startY, initX, initY, initScale;
+            res.onmousedown = (e) => { isResizing = true; e.stopPropagation(); startX = e.clientX; initScale = gameConfig[varScale]; };
+            el.onmousedown = (e) => {
+                if(e.target === res || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+                isDragging = true; startX = e.clientX; startY = e.clientY; initX = gameConfig[varX]; initY = gameConfig[varY];
+            };
+            window.addEventListener('mousemove', (e) => {
+                if(isResizing) {
+                    let newScale = initScale + ((e.clientX - startX) * 0.01);
+                    if(newScale < 0.3) newScale = 0.3; if(newScale > 3) newScale = 3;
+                    gameConfig[varScale] = newScale; el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${gameConfig[varScale]})`;
+                } else if(isDragging) {
+                    gameConfig[varX] = initX + (e.clientX - startX); gameConfig[varY] = initY + (e.clientY - startY);
+                    el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${gameConfig[varScale]})`;
+                }
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; isResizing = false; });
+        }
+
+        function hexToRgba(hex, opacityPercent) { let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r}, ${g}, ${b}, ${opacityPercent / 100})`; }
+        function updateModalBox() { const hex = document.getElementById('ed-modal-box-color').value; const op = document.getElementById('ed-modal-box-opacity').value; gameConfig.style.modalBoxBg = hexToRgba(hex, op); applyConfigStyles(); }
+
+        function toggleTestMode() {
+            const btn = document.getElementById('btn-master-test'); isTestMode = !isTestMode;
+            if(isTestMode) {
+                btn.classList.add('active-test'); btn.innerText = "🛑 ЗАВЕРШИТЬ ТЕСТ";
+                document.querySelectorAll('.pr-tab-btn').forEach(b => { b.style.opacity = '0.3'; b.style.pointerEvents = 'none'; });
+                document.getElementById('start-screen').style.display = 'flex'; document.getElementById('game-screen').style.display = 'none';
+                document.getElementById('final-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
+                document.getElementById('in-game-controls').style.display = 'none';
+            } else {
+                btn.classList.remove('active-test'); btn.innerText = "▶ ТЕСТИРОВАТЬ ИГРУ";
+                document.querySelectorAll('.pr-tab-btn').forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = 'auto'; });
+                setPreviewMode('game', document.querySelectorAll('.pr-tab-btn')[1]);
+                document.getElementById('in-game-controls').style.display = 'none'; buildBoard(); buildTeams(); 
+            }
+        }
+
+        function startGame() {
+            if(!isTestMode && !new URLSearchParams(window.location.search).has('config')) return;
+            gameConfig.teams = parseInt(document.getElementById('team-count').value);
+            scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
+            
+            audioPlayers['click'] = new Audio(gameConfig.sounds.click);
+            audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
+            audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
+            audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
+
+            document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
+        }
+
+        function switchEdTab(tabId, btn) { document.querySelectorAll('.ed-pane').forEach(p => p.classList.remove('active')); document.querySelectorAll('.ed-tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btn.classList.add('active'); }
+        function setPreviewMode(mode, btn) {
+            if(isTestMode) return;
+            document.querySelectorAll('.pr-tab-btn').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active');
+            document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'none'; document.getElementById('final-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
+            if(mode === 'start') document.getElementById('start-screen').style.display = 'flex';
+            if(mode === 'game') { document.getElementById('game-screen').style.display = 'flex'; buildBoard(); buildTeams(); }
+            if(mode === 'question') { document.getElementById('question-modal').style.display = 'flex'; showMockModalForTab(); }
+            if(mode === 'final') { 
+                document.getElementById('final-screen').style.display = 'flex'; 
+                document.getElementById('final-trigger-btn').style.display = 'block';
+                document.getElementById('final-content-wrapper').style.display = 'none';
+            }
+        }
+
+        function copyCode(id, btnElement) {
+            const el = document.getElementById(id);
+            el.select(); document.execCommand('copy');
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Скопировано!"; btnElement.style.background = "#00bcd4"; btnElement.style.color = "#000";
+            setTimeout(() => { btnElement.innerText = originalText; btnElement.style.background = "#4caf50"; btnElement.style.color = "white"; }, 2000);
+        }
+
+        function initPresets() {
+            const gridStart = document.getElementById('preset-grid-start'); presetLinksStart.forEach((p, i) => { gridStart.innerHTML += `<div class="preset-item ${i===0?'active':''}" style="background-image: url('${p.url}')" onclick="setPreset('start', this, '${p.url}')"><div class="preset-label">${p.name}</div></div>`; });
+            const gridModal = document.getElementById('preset-grid-modal'); presetLinksModal.forEach((p, i) => { gridModal.innerHTML += `<div class="preset-item ${i===0?'active':''}" style="background-image: url('${p.url}')" onclick="setPreset('modal', this, '${p.url}')"><div class="preset-label">${p.name}</div></div>`; });
+        }
+        function setPreset(target, btn, url) { btn.parentElement.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active')); btn.classList.add('active'); updateBg(target, `url('${url}')`, false); }
+        function updateBg(target, val, rem) {
+            let cssVal = val; if(!val.startsWith('url') && !val.startsWith('#') && !val.startsWith('linear')) cssVal = `url('${val}')`;
+            if(target === 'start') { gameConfig.style.bgStartImg = cssVal; }
+            if(target === 'modal') { gameConfig.style.bgModalImg = cssVal; }
+            applyConfigStyles();
+        }
+        function toggleBgType() { const isSolid = document.getElementById('bg-type-solid').checked; document.getElementById('bg-solid-wrap').style.display = isSolid ? 'flex' : 'none'; document.getElementById('bg-gradient-wrap').style.display = isSolid ? 'none' : 'flex'; applyGameBoardBg(); }
+        function applyGameBoardBg() { const isSolid = document.getElementById('bg-type-solid').checked; let cssVal = isSolid ? document.getElementById('ed-bg-solid').value : `linear-gradient(135deg, ${document.getElementById('ed-bg-grad-1').value}, ${document.getElementById('ed-bg-grad-2').value})`; gameConfig.style.bgGameBoard = cssVal; applyConfigStyles(); }
+        function updateUnderlay() { const hex = document.getElementById('ed-ul-color').value; const op = document.getElementById('ed-ul-opacity').value; document.getElementById('ed-ul-hex').value = hex; gameConfig.style.underlayBg = hexToRgba(hex, op); gameConfig.style.underlayNeon = document.getElementById('ed-ul-neon').value; applyConfigStyles(); }
+        function applyConfigStyles() {
+            const root = document.documentElement.style;
+            root.setProperty('--font-main', gameConfig.style.fontMain); root.setProperty('--font-title', gameConfig.style.fontTitle);
+            root.setProperty('--text-color', gameConfig.style.textColor); root.setProperty('--title-color', gameConfig.style.titleColor);
+            root.setProperty('--base-font-size', gameConfig.style.baseFontSize); root.setProperty('--title-font-scale', gameConfig.style.titleFontScale);
+            root.setProperty('--bg-start-img', gameConfig.style.bgStartImg); root.setProperty('--bg-game-board', gameConfig.style.bgGameBoard);
+            root.setProperty('--bg-modal-img', gameConfig.style.bgModalImg); root.setProperty('--modal-overlay-opacity', gameConfig.style.modalOverlayOpacity);
+            root.setProperty('--modal-box-bg', gameConfig.style.modalBoxBg); root.setProperty('--underlay-bg', gameConfig.style.underlayBg); root.setProperty('--underlay-neon', gameConfig.style.underlayNeon);
+        }
+        function handleFile(input, callback) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => callback(e.target.result); reader.readAsDataURL(input.files[0]); } }
+        function updatePoints() { for(let i=0; i<5; i++) { gameConfig.points[i] = document.getElementById(`ed-pt-${i}`).value; } buildBoard(); renderQuestionsForms(); }
+        function updateFonts() { 
+            gameConfig.style.fontMain = document.getElementById('ed-font-main').value; gameConfig.style.fontTitle = document.getElementById('ed-font-title').value; 
+            gameConfig.style.textColor = document.getElementById('ed-text-color').value; gameConfig.style.titleColor = document.getElementById('ed-title-color').value;
+            gameConfig.style.baseFontSize = document.getElementById('ed-text-size').value + 'rem'; gameConfig.style.titleFontScale = document.getElementById('ed-title-size').value;
+            applyConfigStyles();
+        }
+        function updateConfigSounds() { const t = ['click', 'correct', 'wrong', 'fanfare']; t.forEach(k => { gameConfig.sounds[k] = document.getElementById(`ed-snd-${k}`).value; }); }
+        
+        function initCategoriesAndAvatars() {
+            const catBox = document.getElementById('ed-categories-box'); catBox.innerHTML = '';
+            for(let i=0; i<5; i++) { catBox.innerHTML += `<div class="flex-row"><input type="color" value="${gameConfig.colColors[i]}" onchange="updateCat(${i}, 'color', this.value)"><input type="text" value="${gameConfig.categories[i]}" onchange="updateCat(${i}, 'text', this.value)"></div>`; }
+            const avaBox = document.getElementById('ed-avatars-box'); avaBox.innerHTML = '';
+            for(let i=0; i<4; i++) { avaBox.innerHTML += `<div style="margin-bottom:15px;"><label>Команда ${i+1}</label><div class="flex-row"><div id="prev-ava-${i}" style="width:40px; height:40px; border-radius:50%; border:2px solid #ccc; overflow:hidden; background:#222;"></div><input type="text" id="ed-ava-input-${i}" value="${gameConfig.avatars[i]}" onchange="updateAva(${i}, this.value)" style="flex-grow:1;"></div></div>`; renderAvaPreview(i, gameConfig.avatars[i]); }
+        }
+        
+        function applyAvatarTheme(theme) { 
+            if(theme === 'animals') gameConfig.avatars = ["🦊", "🐰", "🦁", "🐼"]; 
+            else if(theme === 'robots') gameConfig.avatars = ["🤖", "🦾", "🦿", "🔋"]; 
+            else if(theme === 'xmas') gameConfig.avatars = ["🎄", "🎅", "🎁", "❄️"];
+            else if(theme === 'adventure') gameConfig.avatars = ["🧭", "🗺️", "🏴‍☠️", "💎"];
+            else gameConfig.avatars = ["👾", "👽", "👹", "👻"]; 
+            for(let i=0; i<4; i++) { document.getElementById(`ed-ava-input-${i}`).value = gameConfig.avatars[i]; renderAvaPreview(i, gameConfig.avatars[i]); } 
+            buildTeams(); 
+        }
+
+        function updateCat(i, type, val) { if(type === 'color') gameConfig.colColors[i] = val; if(type === 'text') gameConfig.categories[i] = val; buildBoard(); renderQuestionsForms(); }
+        function updateAva(i, val) { gameConfig.avatars[i] = val; renderAvaPreview(i, val); buildTeams(); }
+        function updateCup(val) { gameConfig.cupImg = val; document.getElementById('reward-image').src = val; }
+        function renderAvaPreview(i, val) { document.getElementById(`prev-ava-${i}`).innerHTML = (!val.startsWith('http') && !val.startsWith('data:')) ? `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">${val}</div>` : `<img src="${val}" style="width:100%;height:100%;object-fit:cover;">`; }
+
+        function renderQuestionsForms() {
+            const container = document.getElementById('questions-editor-container'); container.innerHTML = '';
+            for (let r = 0; r < 5; r++) { 
+                const block = document.createElement('div'); block.className = 'question-block';
+                let isBulk = gameConfig.bulkMode[r];
+                let html = `<div class="question-header"><span>Задание за ${gameConfig.points[r]} баллов</span></div>
+                            <label class="radio-group" style="margin-bottom:15px; color:#2196f3;"><input type="checkbox" ${isBulk ? 'checked' : ''} onchange="toggleBulkMode(${r}, this.checked)">⚡ Вбить ответы автоматически (5 вопросов списком)</label>`;
+                
+                if (isBulk) {
+                    html += `<div class="smart-hint" style="background:#e8f5e9; border-left-color:#4caf50; color:#1b5e20;"><b>Вставьте 5 строк с вопросами.</b> Каждая строка попадет в свою категорию сверху вниз.</div>
+                             <textarea placeholder="Строка 1 (Grammar)\nСтрока 2 (Vocabulary)\n..." rows="6" onchange="handleBulkInput(${r}, this.value)">${gameConfig.bulkText[r]}</textarea>`;
+                    block.innerHTML = html;
+                } else {
+                    block.innerHTML = html;
+                    for(let c = 0; c < 5; c++) { 
+                        const q = gameConfig.questions[c][r]; const catName = gameConfig.categories[c]; const catColor = gameConfig.colColors[c];
+                        const catWrap = document.createElement('div'); catWrap.className = 'cat-q-wrap'; catWrap.style.borderLeftColor = catColor;
+                        let innerHtml = `<div class="cat-q-title" style="color:${catColor};">${catName}</div><textarea placeholder="Впишите вопрос..." onchange="handleSmartInput(${c}, ${r}, this.value)">${q.rawText}</textarea>
+                                         <label class="radio-group" style="margin-bottom:10px;"><input type="checkbox" ${q.hasMedia ? 'checked' : ''} onchange="toggleMedia(${c}, ${r}, this.checked)"> + Добавить картинку/звук</label>`;
+                        if (q.hasMedia) {
+                            innerHtml += `<div class="flex-row" style="background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap: wrap;">
+                                            <select style="width:30%; margin:0;" onchange="updateQData(${c}, ${r}, 'mediaType', this.value)"><option value="image" ${q.mediaType === 'image' ? 'selected' : ''}>Картинка</option><option value="audio" ${q.mediaType === 'audio' ? 'selected' : ''}>Аудио</option></select>
+                                            <input type="text" style="width:65%; margin:0;" placeholder="URL файла" value="${q.mediaUrl}" id="media-url-${c}-${r}" onchange="updateQData(${c}, ${r}, 'mediaUrl', this.value)">
+                                            <div style="width:100%; display:flex; align-items:center; gap:10px; margin-top:5px;">
+                                                <span style="font-size:0.8rem; font-weight:bold;">С компьютера:</span><input type="file" accept="image/*, audio/*" style="flex-grow:1; margin:0;" onchange="handleFile(this, val => { updateQData(${c}, ${r}, 'mediaUrl', val); document.getElementById('media-url-${c}-${r}').value = 'Файл загружен'; })">
+                                            </div>
+                                            <span style="font-size:0.7rem; color:#f44336; width:100%;">*Картинки до 500КБ!</span>
+                                          </div>`;
+                        }
+                        catWrap.innerHTML = innerHtml; block.appendChild(catWrap);
+                    }
+                }
+                container.appendChild(block);
+            }
+        }
+
+        function toggleBulkMode(r, isChecked) { gameConfig.bulkMode[r] = isChecked; renderQuestionsForms(); }
+        function handleBulkInput(r, text) { gameConfig.bulkText[r] = text; let lines = text.split('\n').filter(l => l.trim() !== ''); for(let c = 0; c < 5; c++) { if(lines[c]) { handleSmartInput(c, r, lines[c]); } } }
+        function handleSmartInput(c, r, text) {
+            let q = gameConfig.questions[c][r]; q.rawText = text; let val = text.trim();
+            if(val.includes('|')) {
+                let parts = val.split('|').map(s => s.trim());
+                q.type = 'choice'; q.text = parts[0]; q.correctAnswer = parts[1] || ''; q.options = [q.correctAnswer, parts[2]||'', parts[3]||''];
+            } else if (val.match(/\((.+)\)$/)) {
+                let match = val.match(/(.*?)\((.+)\)$/);
+                q.type = 'input'; q.text = match[1].trim(); q.correctAnswer = match[2].trim();
+            } else { q.type = 'unscramble'; q.text = val === '' ? `Вопрос за ${gameConfig.points[r]} баллов...` : "Соберите предложение:"; q.correctAnswer = val; }
+        }
+        function toggleMedia(c, r, isChecked) { gameConfig.questions[c][r].hasMedia = isChecked; renderQuestionsForms(); }
+        function updateQData(c, r, field, value) { gameConfig.questions[c][r][field] = value; }
+
+        function buildBoard() {
+            const board = document.getElementById('jeopardy-board'); if(!board) return; board.innerHTML = '';
+            gameConfig.categories.forEach((cat, colIndex) => {
+                const catEl = document.createElement('div'); catEl.className = 'category-cell'; catEl.innerText = cat; catEl.style.setProperty('--col-color', gameConfig.colColors[colIndex]); board.appendChild(catEl);
+            });
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.createElement('div'); cell.className = 'question-cell'; cell.innerText = gameConfig.points[row];
+                    const hex = gameConfig.colColors[col]; cell.style.setProperty('--col-color', hex); cell.style.setProperty('--col-color-transparent', hex + '33');
+                    cell.onclick = function() {
+                        if (this.classList.contains('disabled')) return;
+                        playSound('click'); activeCell = this; currentPoints = parseInt(gameConfig.points[row]);
+                        openRealModal(gameConfig.categories[col], currentPoints, hex, col, row);
+                    };
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function buildTeams() {
+            const panel = document.getElementById('teams-panel'); if(!panel) return; panel.innerHTML = '';
+            const tCount = (isTestMode || new URLSearchParams(window.location.search).has('config')) ? gameConfig.teams : parseInt(document.getElementById('team-count').value);
+            for (let i = 0; i < tCount; i++) {
+                const teamCard = document.createElement('div'); teamCard.className = 'team-card'; if(i === currentTeamIndex) teamCard.classList.add('active');
+                teamCard.id = `team-card-${i}`;
+                teamCard.innerHTML = `<div class="team-avatar">${(!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">${gameConfig.avatars[i]}</div>` : `<img src="${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">`}</div><div class="team-info"><span class="team-score" id="score-${i}">${isTestMode ? scores[i] : 0}</span></div>`;
+                panel.appendChild(teamCard);
+            }
+        }
+
+        function openRealModal(category, points, colorHex, col, row) {
+            currentActiveCol = col; currentActiveRow = row;
+            document.getElementById('modal-header-text').innerText = `${category} - ${points}`;
+            document.getElementById('modal-content-box').style.setProperty('--col-color', colorHex);
+            const area = document.getElementById('modal-interactive-area'); const taskText = document.getElementById('modal-task-text');
+            area.innerHTML = ''; document.getElementById('result-overlay').style.opacity = '0';
+            
+            let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
+            const q = gameConfig.questions[col][row]; taskText.innerText = q.text;
+
+            if(q.hasMedia && q.mediaUrl.trim() !== '') {
+                const mediaCont = document.createElement('div'); mediaCont.className = 'media-container';
+                if(q.mediaType === 'image') mediaCont.innerHTML = `<img src="${q.mediaUrl}">`; else if(q.mediaType === 'audio') mediaCont.innerHTML = `<audio controls src="${q.mediaUrl}" autoplay></audio>`;
+                area.appendChild(mediaCont);
+            }
+
+            if(q.type === 'choice') { 
+                const wrap = document.createElement('div'); wrap.className = 'choice-container';
+                let validOptions = q.options.filter(o => o && o.trim() !== ''); validOptions.sort(() => Math.random() - 0.5);
+                validOptions.forEach(opt => {
+                    const btn = document.createElement('button'); btn.className = 'btn-choice'; btn.innerText = opt;
+                    btn.onclick = () => answerLogic(opt === q.correctAnswer, btn); wrap.appendChild(btn);
+                });
+                area.appendChild(wrap);
+            } else if(q.type === 'input') { 
+                area.innerHTML += `<input type="text" id="active-input-ans" class="input-field" placeholder="Введите ответ..."><br>`;
+                const btn = document.createElement('button'); btn.className = 'btn-submit'; btn.innerText = 'Проверить';
+                btn.onclick = () => {
+                    let possibleAnswers = q.correctAnswer.split(',').map(s => s.trim().toLowerCase());
+                    let userAns = document.getElementById('active-input-ans').value.trim().toLowerCase();
+                    answerLogic(possibleAnswers.includes(userAns), null);
+                }
+                area.appendChild(btn);
+            } else if(q.type === 'unscramble') { 
+                const ansLine = document.createElement('div'); ansLine.className = 'answer-line'; const pool = document.createElement('div'); pool.className = 'word-pool';
+                let words = q.correctAnswer.split(' ').filter(w => w.trim() !== ''); words.sort(() => Math.random() - 0.5);
+                words.forEach(w => {
+                    const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = w;
+                    chip.onclick = function() { if(this.parentElement === pool) ansLine.appendChild(this); else pool.appendChild(this); };
+                    pool.appendChild(chip);
+                });
+                const btn = document.createElement('button'); btn.className = 'btn-submit'; btn.innerText = 'Проверить';
+                btn.onclick = () => answerLogic(Array.from(ansLine.children).map(c => c.innerText).join(' ') === q.correctAnswer, null);
+                area.appendChild(ansLine); area.appendChild(pool); area.appendChild(btn);
+            }
+            document.getElementById('question-modal').style.display = 'flex';
+        }
+
+        function showMockModalForTab() { openRealModal(gameConfig.categories[mockTypeIndex], gameConfig.points[0], gameConfig.colColors[mockTypeIndex], mockTypeIndex, 0); mockTypeIndex = (mockTypeIndex + 1) % 5; }
+
+        function answerLogic(isCorrect, el) {
+            document.getElementById('modal-interactive-area').style.pointerEvents = 'none';
+            const overlay = document.getElementById('result-overlay'); overlay.style.opacity = '1';
+            let q = gameConfig.questions[currentActiveCol][currentActiveRow];
+
+            if(isCorrect) {
+                playSound('correct'); overlay.style.background = 'var(--correct-color)'; overlay.innerHTML = '✓'; overlay.style.color = '#000';
+                if(el) { el.style.borderColor = 'var(--correct-color)'; el.style.boxShadow = '0 0 15px var(--correct-color)'; el.style.background = 'rgba(0,255,0,0.2)';}
+                if(isTestMode) { scores[currentTeamIndex] += currentPoints; document.getElementById(`score-${currentTeamIndex}`).innerText = scores[currentTeamIndex]; }
+            } else {
+                playSound('wrong'); overlay.style.background = 'var(--wrong-color)'; overlay.innerHTML = '✗'; overlay.style.color = '#fff';
+                if(el) { el.style.borderColor = 'var(--wrong-color)'; el.style.boxShadow = '0 0 15px var(--wrong-color)'; el.style.background = 'rgba(255,0,0,0.2)';}
+                
+                if (q.type === 'choice') {
+                    document.querySelectorAll('.btn-choice').forEach(b => {
+                        if(b.innerText === q.correctAnswer) { b.style.borderColor = 'var(--correct-color)'; b.style.boxShadow = '0 0 20px var(--correct-color)'; b.style.background = 'rgba(0,255,0,0.3)'; }
+                    });
+                } else if (q.type === 'input') {
+                    let inp = document.getElementById('active-input-ans'); inp.value = q.correctAnswer.split(',')[0]; 
+                    inp.style.borderColor = 'var(--correct-color)'; inp.style.color = 'var(--correct-color)'; inp.style.boxShadow = '0 0 15px var(--correct-color)';
+                } else if (q.type === 'unscramble') {
+                    let ansLine = document.querySelector('.answer-line'); ansLine.innerHTML = '';
+                    let pool = document.querySelector('.word-pool'); pool.innerHTML = '';
+                    q.correctAnswer.split(' ').forEach(w => {
+                        if(w.trim()) {
+                            let chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = w;
+                            chip.style.background = 'var(--correct-color)'; chip.style.color = '#000'; chip.style.boxShadow = '0 0 15px var(--correct-color)';
+                            ansLine.appendChild(chip);
+                        }
+                    });
+                }
+            }
+            let nextBtn = document.createElement('button'); nextBtn.className = 'btn-next-arrow'; nextBtn.innerHTML = 'ПРОДОЛЖИТЬ ➔'; nextBtn.onclick = closeQuestionModal;
+            document.getElementById('modal-content-box').appendChild(nextBtn);
+        }
+
+        function closeQuestionModal() {
+            let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
+            document.getElementById('question-modal').style.display = 'none'; document.getElementById('modal-interactive-area').style.pointerEvents = 'auto';
+            if (activeCell && isTestMode) { activeCell.innerText = ""; activeCell.classList.add('disabled'); activeCell = null; }
+            if(isTestMode) { questionsAnswered++; if (questionsAnswered >= totalQuestions) forceEndGame(); else nextTurn(); }
+        }
+
+        function nextTurn() {
+            document.getElementById(`team-card-${currentTeamIndex}`).classList.remove('active');
+            currentTeamIndex = (currentTeamIndex + 1) % gameConfig.teams;
+            document.getElementById(`team-card-${currentTeamIndex}`).classList.add('active');
+        }
+
+        function forceEndGame() {
+            document.getElementById('game-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
+            
+            document.querySelectorAll('.pr-tab-btn').forEach(b => b.classList.remove('active'));
+            const finalTab = Array.from(document.querySelectorAll('.pr-tab-btn')).find(b => b.innerText.includes('Финал')); if(finalTab) finalTab.classList.add('active');
+
+            // Показываем экран финала, но только триггерную кнопку
+            document.getElementById('final-screen').style.display = 'flex'; 
+            document.getElementById('final-trigger-btn').style.display = 'block';
+            document.getElementById('final-content-wrapper').style.display = 'none';
+            
+            document.getElementById('reward-image').src = gameConfig.cupImg;
+
+            let results = [];
+            for (let i = 0; i < gameConfig.teams; i++) { results.push({ id: i, name: `Team ${i + 1}`, score: scores[i], avatar: (!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">${gameConfig.avatars[i]}</div>` : `<img src="${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">` }); }
+            results.sort((a, b) => b.score - a.score);
+
+            const titleEl = document.getElementById('winner-title'); const subEl = document.getElementById('winner-subtitle');
+            if (results[0].score === 0) { titleEl.innerText = "Game Over"; subEl.innerText = "No points scored."; }
+            else { titleEl.innerText = `${results[0].name} Wins!`; subEl.innerText = `With ${results[0].score} points!`; }
+
+            const lbContainer = document.getElementById('leaderboard'); lbContainer.innerHTML = '';
+            results.forEach((team, index) => { lbContainer.innerHTML += `<div class="leaderboard-row"><div>#${index + 1}</div><div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; overflow:hidden;">${team.avatar}</div> ${team.name}</div><div style="color:var(--points-color); font-weight:bold;">${team.score}</div></div>`; });
+
+            if(isTestMode && !new URLSearchParams(window.location.search).has('config')) {
+                const btn = document.getElementById('btn-master-test'); btn.classList.remove('active-test'); btn.innerText = "▶ ТЕСТИРОВАТЬ ИГРУ";
+                document.querySelectorAll('.pr-tab-btn').forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = 'auto'; });
+                isTestMode = false;
+            }
+        }
+
+        // Эта функция вызывается при клике на кнопку УЗНАТЬ ПОБЕДИТЕЛЯ
+        function showFinalResults() {
+            playSound('fanfare');
+            document.getElementById('final-trigger-btn').style.display = 'none';
+            document.getElementById('final-content-wrapper').style.display = 'flex';
+        }
+
+        // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА ---
+        function generateGameCode() {
+            const configStr = JSON.stringify(gameConfig);
+            const base64Config = btoa(unescape(encodeURIComponent(configStr)));
+            
+            // 1. Берем базовую ссылку, которую ввел пользователь, и прикрепляем конфиг
+            let baseUrl = document.getElementById('ed-base-game-url').value.trim();
+            if (!baseUrl) { alert("Пожалуйста, введите ссылку на игру (базовый URL)!"); return; }
+            if (!baseUrl.endsWith('/') && !baseUrl.includes('?')) baseUrl += '/';
+            if (!baseUrl.includes('?')) baseUrl += '?config='; else baseUrl += '&config=';
+            
+            const fullDirectUrl = baseUrl + base64Config;
+            
+            // 2. Генерируем ПРЯМОЙ Iframe
+            const iframeDirectCode = `<iframe src="${fullDirectUrl}" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            
+            // 3. Генерируем ЗАМАСКИРОВАННЫЙ Iframe (Обфускация)
+            // Создаем мини-HTML страницу, которая скриптом расшифровывает URL и перенаправляет на него. 
+            // Сама эта мини-страница кодируется в Base64.
+            const redirectScript = `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;color:#fff;font-family:sans-serif;">Loading...<script>window.location.replace(decodeURIComponent(escape(atob('${btoa(unescape(encodeURIComponent(fullDirectUrl)))}'))));<\/script></body></html>`;
+            const obfUrl = "data:text/html;base64," + btoa(unescape(encodeURIComponent(redirectScript)));
+            
+            const iframeObfCode = `<iframe src="${obfUrl}" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+
+            // 4. Формируем чистый HTML код (только игра)
+            let rootStyles = `:root {
+                --font-main: ${gameConfig.style.fontMain}; --font-title: ${gameConfig.style.fontTitle};
+                --text-color: ${gameConfig.style.textColor}; --title-color: ${gameConfig.style.titleColor};
+                --base-font-size: ${gameConfig.style.baseFontSize}; --title-font-scale: ${gameConfig.style.titleFontScale};
+                --title-font-size: 4rem; --points-color: #ffd700; --correct-color: #00ff00; --wrong-color: #ff0044;
+                --neon-intensity: 15px; --neon-border: 2px;
+                --bg-start-img: ${gameConfig.style.bgStartImg}; --bg-game-board: ${gameConfig.style.bgGameBoard};
+                --bg-modal-img: ${gameConfig.style.bgModalImg}; --modal-overlay-opacity: ${gameConfig.style.modalOverlayOpacity};
+                --modal-box-bg: ${gameConfig.style.modalBoxBg}; --underlay-bg: ${gameConfig.style.underlayBg};
+                --underlay-neon: ${gameConfig.style.underlayNeon};
+            }`;
+
+            let fullHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game by English Bootcamp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <style>
+        ${rootStyles}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #111; }
+        .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        #play-mode { width: 100%; height: 100%; position: relative; color: var(--text-color); font-family: var(--font-main); font-size: var(--base-font-size); overflow: hidden; background: #000;}
+        .game-controls { position: absolute; top: 15px; right: 15px; display: none; gap: 10px; z-index: 250; }
+        .btn-control { background: rgba(0,0,0,0.6); color: var(--text-color); border: 1px solid #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-family: var(--font-main); transition: 0.3s; backdrop-filter: blur(5px);}
+        .btn-control:hover { background: #fff; color: #000; }
+        .underlay-box { background: var(--underlay-bg); border: var(--neon-border) solid var(--underlay-neon); box-shadow: 0 0 var(--neon-intensity) var(--underlay-neon); border-radius: 15px; padding: 20px; backdrop-filter: blur(5px); }
+        
+        #start-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background-image: var(--bg-start-img); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        #drag-title-container { position: absolute; padding: 15px 30px; display: inline-block; min-width: 200px; text-align: center; z-index: 110;}
+        .game-title { font-family: var(--font-title); font-size: var(--title-font-size); font-weight: 900; text-transform: uppercase; color: var(--title-color); text-shadow: 0 0 var(--neon-intensity) #fff; margin: 0; line-height: 1.1; user-select: none;}
+        #drag-team-container { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 1rem; z-index: 110; padding: 30px;}
+        .team-selection select { font-family: var(--font-main); font-size: 1.2em; padding: 0.5rem 1rem; border-radius: 8px; color: #000; }
+        .btn-start { font-family: var(--font-title); font-size: 1.8em; padding: 1rem 3rem; background: transparent; color: var(--title-color); border: 2px solid var(--title-color); border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        .btn-start:hover { background: #fff; color: #000; box-shadow: 0 0 var(--neon-intensity) #fff; transform: scale(1.05); }
+
+        #game-screen { display: none; width: 100%; height: 100%; flex-direction: column; padding: 15px; position: relative; background: var(--bg-game-board); }
+        #jeopardy-board { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto repeat(5, 1fr); gap: 10px; flex-grow: 1; margin-bottom: 15px; margin-top: 20px; }
+        .category-cell { background: var(--col-color); color: var(--title-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 5px; font-family: var(--font-title); font-size: calc(1.5rem * var(--title-font-scale)); font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: var(--neon-border) solid rgba(255,255,255,0.3); }
+        .question-cell { background: var(--col-color-transparent); border: var(--neon-border) solid var(--col-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-size: calc(2.5rem * var(--title-font-scale)); font-weight: 900; color: var(--points-color); cursor: pointer; transition: all 0.2s; text-shadow: 1px 1px 2px #000; }
+        .question-cell:hover { background: var(--col-color); box-shadow: 0 0 var(--neon-intensity) var(--col-color); color: #fff; transform: translateY(-2px); }
+        .question-cell.disabled { opacity: 0.15; pointer-events: none; filter: grayscale(80%); }
+        #teams-panel { display: flex; justify-content: space-evenly; align-items: center; height: 80px; }
+        .team-card { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.1); padding: 5px 15px 5px 5px; border-radius: 40px; border: 1px solid transparent; transition: 0.3s; opacity: 0.8; }
+        .team-card.active { border-color: #fff; box-shadow: 0 0 var(--neon-intensity) rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.2); opacity: 1; }
+        .team-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #222; border: 2px solid #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .team-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .team-info { display: flex; flex-direction: column; }
+        .team-score { font-family: var(--font-title); font-size: 1.5rem; font-weight: bold; color: var(--points-color); }
+
+        #question-modal { position: absolute; inset: 0; display: none; justify-content: center; align-items: center; z-index: 200; background-image: var(--bg-modal-img); background-size: cover; background-position: center; background-repeat: no-repeat; flex-direction: column; }
+        #question-modal::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,var(--modal-overlay-opacity)); z-index: 0; }
+        .modal-content { background: var(--modal-box-bg); border: var(--neon-border) solid var(--col-color, #fff); border-radius: 15px; padding: 40px; width: 90%; max-width: 800px; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1; }
+        .modal-header { font-family: var(--font-title); font-size: calc(1.2rem * var(--title-font-scale)); color: var(--points-color); margin-bottom: 15px; }
+        .modal-task-text { font-size: 1.5em; margin-bottom: 20px; font-weight: 600; text-shadow: 1px 1px 3px #000; color: var(--text-color);}
+        .media-container img { max-width: 100%; max-height: 250px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #555; }
+        .media-container audio { margin-bottom: 15px; width: 80%; }
+        .choice-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-choice { background: rgba(0,0,0,0.5); color: var(--text-color); border: 1px solid #aaa; border-radius: 8px; padding: 12px 25px; font-size: 1em; font-family: var(--font-main); cursor: pointer; transition: 0.2s;}
+        .btn-choice:hover { border-color: #fff; box-shadow: 0 0 10px #fff; background: rgba(255,255,255,0.2); }
+        .btn-choice.correct { border-color: var(--correct-color); background: rgba(0,255,0,0.2); box-shadow: 0 0 15px var(--correct-color); }
+        .btn-choice.wrong { border-color: var(--wrong-color); background: rgba(255,0,0,0.2); box-shadow: 0 0 15px var(--wrong-color); }
+        .input-field { font-size: 1.5em; padding: 10px; text-align: center; border-radius: 8px; border: 2px solid #555; background: #222; color: #fff; font-family: var(--font-main); transition: 0.3s;}
+        .btn-submit { margin-top: 20px; padding: 10px 30px; font-size: 1em; font-family: var(--font-title); background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; }
+        .answer-line { display: flex; gap: 10px; min-height: 60px; padding: 10px; border-bottom: 2px solid #fff; justify-content: center; margin-bottom: 15px; align-items: center; flex-wrap: wrap;}
+        .word-pool { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .word-chip { background: #222; border: 1px solid transparent; outline: 1px solid #555; padding: 10px 15px; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: 0.3s; user-select: none;}
+        .word-chip:hover { outline-color: var(--col-color, #0ff); box-shadow: 0 0 10px var(--col-color, #0ff); }
+        .answer-line .word-chip { background: var(--col-color, #0ff); color: #000; outline: none; box-shadow: 0 0 15px var(--col-color, #0ff); font-weight: bold; }
+        #result-overlay { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 10; }
+        .btn-next-arrow { margin-top: 25px; padding: 12px 35px; font-size: 1.5rem; font-family: var(--font-title); background: #000; color: #0ff; border: 2px solid #0ff; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px #0ff; text-transform: uppercase; animation: pulse 1.5s infinite; position: relative; z-index: 5; }
+        .btn-next-arrow:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
+        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center;}
+        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; }
+        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color);}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color);}
+    </style>
+</head>
+<body>
+    <div id="play-mode">
+        <div id="start-screen">
+            <div id="drag-title-container" class="underlay-box" style="transform: translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale});">
+                <h1 class="game-title">${gameConfig.title}</h1>
+            </div>
+            <div id="drag-team-container" class="team-selection underlay-box" style="transform: translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale});">
+                <label for="team-count" style="color:var(--text-color);">Количество команд:</label>
+                <select id="team-count">
+                    <option value="2">2 команды</option><option value="3">3 команды</option><option value="4" selected>4 команды</option>
+                </select>
+                <button class="btn-start" onclick="startGame()">Start</button>
+            </div>
+        </div>
+        <div id="game-screen">
+            <div id="jeopardy-board"></div>
+            <div class="underlay-box" id="teams-panel"></div>
+        </div>
+        <div id="question-modal">
+            <div class="modal-content" id="modal-content-box">
+                <div id="result-overlay"></div>
+                <div class="modal-header" id="modal-header-text">Category - Points</div>
+                <div class="modal-task-text" id="modal-task-text">Task text</div>
+                <div id="modal-interactive-area"></div>
+            </div>
+        </div>
+        <div id="final-screen">
+            <button id="final-trigger-btn" class="btn-start" onclick="showFinalResults()" style="font-size: 2.5rem; animation: pulse 1.5s infinite; border-color: var(--points-color); color: var(--points-color); z-index: 310;">🏆 УЗНАТЬ ПОБЕДИТЕЛЯ 🏆</button>
+            <div id="final-content-wrapper" style="display:none; flex-direction:column; align-items:center; width:100%; z-index: 305;">
+                <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
+                <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
+                <img id="reward-image" src="${gameConfig.cupImg}">
+                <div class="underlay-box" id="leaderboard"></div>
+            </div>
+        </div>
+        <div class="game-controls" id="in-game-controls">
+            <button class="btn-control btn-restart" onclick="location.reload()">↺ Заново</button>
+            <button class="btn-control btn-finish-early" onclick="forceEndGame()">🏁 Завершить игру</button>
+        </div>
+    </div>
+    <script>
+        const gameConfig = ${JSON.stringify(gameConfig)};
+        let scores = []; let currentTeamIndex = 0; let questionsAnswered = 0; const totalQuestions = 25; 
+        let activeCell = null; let currentPoints = 0; let currentActiveCol = 0; let currentActiveRow = 0;
+        let audioPlayers = {};
+
+        function playSound(type) { 
+            if (audioPlayers[type]) { 
+                audioPlayers[type].currentTime = 0;
+                audioPlayers[type].play().catch(e => console.log("Audio block by browser:", e)); 
+            } 
+        }
+
+        function startGame() {
+            gameConfig.teams = parseInt(document.getElementById('team-count').value);
+            scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
+            
+            audioPlayers['click'] = new Audio(gameConfig.sounds.click);
+            audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
+            audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
+            audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
+
+            document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
+        }
+
+        function buildBoard() {
+            const board = document.getElementById('jeopardy-board'); if(!board) return; board.innerHTML = '';
+            gameConfig.categories.forEach((cat, colIndex) => {
+                const catEl = document.createElement('div'); catEl.className = 'category-cell'; catEl.innerText = cat; catEl.style.setProperty('--col-color', gameConfig.colColors[colIndex]); board.appendChild(catEl);
+            });
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.createElement('div'); cell.className = 'question-cell'; cell.innerText = gameConfig.points[row];
+                    const hex = gameConfig.colColors[col]; cell.style.setProperty('--col-color', hex); cell.style.setProperty('--col-color-transparent', hex + '33');
+                    cell.onclick = function() {
+                        if (this.classList.contains('disabled')) return;
+                        playSound('click'); activeCell = this; currentPoints = parseInt(gameConfig.points[row]);
+                        openRealModal(gameConfig.categories[col], currentPoints, hex, col, row);
+                    };
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function buildTeams() {
+            const panel = document.getElementById('teams-panel'); if(!panel) return; panel.innerHTML = '';
+            for (let i = 0; i < gameConfig.teams; i++) {
+                const teamCard = document.createElement('div'); teamCard.className = 'team-card'; if(i === currentTeamIndex) teamCard.classList.add('active');
+                teamCard.id = \`team-card-\${i}\`;
+                teamCard.innerHTML = \`<div class="team-avatar">\${(!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? \`<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">\${gameConfig.avatars[i]}</div>\` : \`<img src="\${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">\`}</div><div class="team-info"><span class="team-score" id="score-\${i}">\${scores[i]}</span></div>\`;
+                panel.appendChild(teamCard);
+            }
+        }
+
+        function openRealModal(category, points, colorHex, col, row) {
+            currentActiveCol = col; currentActiveRow = row;
+            document.getElementById('modal-header-text').innerText = \`\${category} - \${points}\`;
+            document.getElementById('modal-content-box').style.setProperty('--col-color', colorHex);
+            const area = document.getElementById('modal-interactive-area'); const taskText = document.getElementById('modal-task-text');
+            area.innerHTML = ''; document.getElementById('result-overlay').style.opacity = '0';
+            
+            let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
+            const q = gameConfig.questions[col][row]; taskText.innerText = q.text;
+
+            if(q.hasMedia && q.mediaUrl.trim() !== '') {
+                const mediaCont = document.createElement('div'); mediaCont.className = 'media-container';
+                if(q.mediaType === 'image') mediaCont.innerHTML = \`<img src="\${q.mediaUrl}">\`; else if(q.mediaType === 'audio') mediaCont.innerHTML = \`<audio controls src="\${q.mediaUrl}" autoplay></audio>\`;
+                area.appendChild(mediaCont);
+            }
+
+            if(q.type === 'choice') { 
+                const wrap = document.createElement('div'); wrap.className = 'choice-container';
+                let validOptions = q.options.filter(o => o && o.trim() !== ''); validOptions.sort(() => Math.random() - 0.5);
+                validOptions.forEach(opt => {
+                    const btn = document.createElement('button'); btn.className = 'btn-choice'; btn.innerText = opt;
+                    btn.onclick = () => answerLogic(opt === q.correctAnswer, btn); wrap.appendChild(btn);
+                });
+                area.appendChild(wrap);
+            } else if(q.type === 'input') { 
+                area.innerHTML += \`<input type="text" id="active-input-ans" class="input-field" placeholder="Введите ответ..."><br>\`;
+                const btn = document.createElement('button'); btn.className = 'btn-submit'; btn.innerText = 'Проверить';
+                btn.onclick = () => {
+                    let possibleAnswers = q.correctAnswer.split(',').map(s => s.trim().toLowerCase());
+                    let userAns = document.getElementById('active-input-ans').value.trim().toLowerCase();
+                    answerLogic(possibleAnswers.includes(userAns), null);
+                }
+                area.appendChild(btn);
+            } else if(q.type === 'unscramble') { 
+                const ansLine = document.createElement('div'); ansLine.className = 'answer-line'; const pool = document.createElement('div'); pool.className = 'word-pool';
+                let words = q.correctAnswer.split(' ').filter(w => w.trim() !== ''); words.sort(() => Math.random() - 0.5);
+                words.forEach(w => {
+                    const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = w;
+                    chip.onclick = function() { if(this.parentElement === pool) ansLine.appendChild(this); else pool.appendChild(this); };
+                    pool.appendChild(chip);
+                });
+                const btn = document.createElement('button'); btn.className = 'btn-submit'; btn.innerText = 'Проверить';
+                btn.onclick = () => answerLogic(Array.from(ansLine.children).map(c => c.innerText).join(' ') === q.correctAnswer, null);
+                area.appendChild(ansLine); area.appendChild(pool); area.appendChild(btn);
+            }
+            document.getElementById('question-modal').style.display = 'flex';
+        }
+
+        function answerLogic(isCorrect, el) {
+            document.getElementById('modal-interactive-area').style.pointerEvents = 'none';
+            const overlay = document.getElementById('result-overlay'); overlay.style.opacity = '1';
+            let q = gameConfig.questions[currentActiveCol][currentActiveRow];
+
+            if(isCorrect) {
+                playSound('correct'); overlay.style.background = 'var(--correct-color)'; overlay.innerHTML = '✓'; overlay.style.color = '#000';
+                if(el) { el.style.borderColor = 'var(--correct-color)'; el.style.boxShadow = '0 0 15px var(--correct-color)'; el.style.background = 'rgba(0,255,0,0.2)';}
+                scores[currentTeamIndex] += currentPoints; document.getElementById(\`score-\${currentTeamIndex}\`).innerText = scores[currentTeamIndex];
+            } else {
+                playSound('wrong'); overlay.style.background = 'var(--wrong-color)'; overlay.innerHTML = '✗'; overlay.style.color = '#fff';
+                if(el) { el.style.borderColor = 'var(--wrong-color)'; el.style.boxShadow = '0 0 15px var(--wrong-color)'; el.style.background = 'rgba(255,0,0,0.2)';}
+                
+                if (q.type === 'choice') {
+                    document.querySelectorAll('.btn-choice').forEach(b => {
+                        if(b.innerText === q.correctAnswer) { b.style.borderColor = 'var(--correct-color)'; b.style.boxShadow = '0 0 20px var(--correct-color)'; b.style.background = 'rgba(0,255,0,0.3)'; }
+                    });
+                } else if (q.type === 'input') {
+                    let inp = document.getElementById('active-input-ans'); inp.value = q.correctAnswer.split(',')[0]; 
+                    inp.style.borderColor = 'var(--correct-color)'; inp.style.color = 'var(--correct-color)'; inp.style.boxShadow = '0 0 15px var(--correct-color)';
+                } else if (q.type === 'unscramble') {
+                    let ansLine = document.querySelector('.answer-line'); ansLine.innerHTML = '';
+                    let pool = document.querySelector('.word-pool'); pool.innerHTML = '';
+                    q.correctAnswer.split(' ').forEach(w => {
+                        if(w.trim()) {
+                            let chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = w;
+                            chip.style.background = 'var(--correct-color)'; chip.style.color = '#000'; chip.style.boxShadow = '0 0 15px var(--correct-color)';
+                            ansLine.appendChild(chip);
+                        }
+                    });
+                }
+            }
+            let nextBtn = document.createElement('button'); nextBtn.className = 'btn-next-arrow'; nextBtn.innerHTML = 'ПРОДОЛЖИТЬ ➔'; nextBtn.onclick = closeQuestionModal;
+            document.getElementById('modal-content-box').appendChild(nextBtn);
+        }
+
+        function closeQuestionModal() {
+            let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
+            document.getElementById('question-modal').style.display = 'none'; document.getElementById('modal-interactive-area').style.pointerEvents = 'auto';
+            if (activeCell) { activeCell.innerText = ""; activeCell.classList.add('disabled'); activeCell = null; }
+            questionsAnswered++; if (questionsAnswered >= totalQuestions) forceEndGame(); else nextTurn();
+        }
+
+        function nextTurn() {
+            document.getElementById(\`team-card-\${currentTeamIndex}\`).classList.remove('active');
+            currentTeamIndex = (currentTeamIndex + 1) % gameConfig.teams;
+            document.getElementById(\`team-card-\${currentTeamIndex}\`).classList.add('active');
+        }
+
+        function forceEndGame() {
+            document.getElementById('game-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
+            
+            document.getElementById('final-screen').style.display = 'flex'; 
+            document.getElementById('final-trigger-btn').style.display = 'block';
+            document.getElementById('final-content-wrapper').style.display = 'none';
+            
+            let results = [];
+            for (let i = 0; i < gameConfig.teams; i++) { results.push({ id: i, name: \`Team \${i + 1}\`, score: scores[i], avatar: (!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? \`<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">\${gameConfig.avatars[i]}</div>\` : \`<img src="\${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">\` }); }
+            results.sort((a, b) => b.score - a.score);
+
+            const titleEl = document.getElementById('winner-title'); const subEl = document.getElementById('winner-subtitle');
+            if (results[0].score === 0) { titleEl.innerText = "Game Over"; subEl.innerText = "No points scored."; }
+            else { titleEl.innerText = \`\${results[0].name} Wins!\`; subEl.innerText = \`With \${results[0].score} points!\`; }
+
+            const lbContainer = document.getElementById('leaderboard'); lbContainer.innerHTML = '';
+            results.forEach((team, index) => { lbContainer.innerHTML += \`<div class="leaderboard-row"><div>#\${index + 1}</div><div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; overflow:hidden;">\${team.avatar}</div> \${team.name}</div><div style="color:var(--points-color); font-weight:bold;">\${team.score}</div></div>\`; });
+        }
+
+        function showFinalResults() {
+            playSound('fanfare');
+            document.getElementById('final-trigger-btn').style.display = 'none';
+            document.getElementById('final-content-wrapper').style.display = 'flex';
+        }
+
+        // Защита от правого клика
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
+        });
+    <\/script>
+</body>
+</html>`;
+
+            document.getElementById('out-html').value = fullHTML;
+            document.getElementById('out-iframe-direct').value = iframeDirectCode;
+            document.getElementById('out-iframe-obf').value = iframeObfCode;
+            document.getElementById('export-result').style.display = 'block';
+        }
+
+        // Защита от правого клика в редакторе
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
+        });
+
+    </script>
+</body>
+</html>
