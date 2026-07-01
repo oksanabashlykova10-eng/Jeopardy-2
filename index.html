@@ -1,9 +1,10 @@
+HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeopardy Game Editor</title>
+    <title>Jeopardy Game Editor by English Bootcamp</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
     
@@ -379,27 +380,24 @@
 
                 <!-- Вкладка: ЭКСПОРТ ИГРЫ -->
                 <div id="tab-export" class="ed-pane">
-                    <h3>Экспорт игры</h3>
-                    <div class="form-group">
-                        <label style="color:#000; font-weight:bold; font-size:1rem;">Ссылка для сборки (базовый URL):</label>
-                        <input type="text" id="ed-base-game-url" value="https://oksanabashlykova10-eng.github.io/Jeopardy-2/" placeholder="Вставьте ссылку на игру...">
-                    </div>
+                    
+                    <!-- ПОЛЕ GITHUB ПОЛНОСТЬЮ УДАЛЕНО -->
 
-                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД</button>
+                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД ИГРЫ</button>
                     
                     <div id="export-result" style="display:none;">
                         
                         <label style="display:block; margin-bottom:5px; font-weight:bold;">1. Код для вставки (Iframe):</label>
-                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте для интеграции в Genially или другие платформы.</p>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте этот код для интеграции в Genially. Игра зашита внутри ссылки.</p>
                         <div class="flex-row" style="margin-bottom: 20px;">
-                            <textarea id="out-iframe-direct" rows="3" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <textarea id="out-iframe-direct" rows="4" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                             <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
                         </div>
                         
                         <label style="display:block; margin-bottom:5px; font-weight:bold;">2. Чистый HTML-код (Для сайта):</label>
                         <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Полный исходный код игры в одном файле.</p>
                         <div class="flex-row">
-                            <textarea id="out-html" rows="3" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                            <textarea id="out-html" rows="4" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                             <button onclick="copyCode('out-html', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
                         </div>
                     </div>
@@ -525,18 +523,9 @@
         let activeCell = null; let currentPoints = 0; let currentActiveCol = 0; let currentActiveRow = 0; 
         let audioPlayers = {}; 
 
-        // Инициализация "2-в-1"
+        // Инициализация
         window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('config')) {
-                try {
-                    const configStr = decodeURIComponent(escape(atob(urlParams.get('config'))));
-                    gameConfig = JSON.parse(configStr);
-                    initGameOnlyMode();
-                } catch(e) { console.error("Config URL error", e); initEditorMode(); }
-            } else {
-                initEditorMode();
-            }
+            initEditorMode();
         };
 
         function initEditorMode() {
@@ -544,29 +533,10 @@
             document.getElementById('start-screen').style.display = 'flex'; document.getElementById('game-screen').style.display = 'none';
         }
 
-        function initGameOnlyMode() {
-            document.getElementById('editor-ui').style.display = 'none';
-            document.getElementById('preview-tabs').style.display = 'none';
-            document.getElementById('preview-area').style.width = '100%';
-            
-            applyConfigStyles();
-            isTestMode = true; 
-            
-            document.getElementById('drag-title-container').style.transform = `translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale})`;
-            document.getElementById('drag-team-container').style.transform = `translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale})`;
-            document.getElementById('drag-title-text').innerText = gameConfig.title;
-            
-            document.getElementById('title-resizer').style.display = 'none';
-            document.getElementById('team-resizer').style.display = 'none';
-            
-            document.getElementById('start-screen').style.display = 'flex';
-            document.getElementById('game-screen').style.display = 'none';
-        }
-
         function playSound(type) { 
             if (audioPlayers[type]) { 
                 audioPlayers[type].currentTime = 0;
-                audioPlayers[type].play().catch(e => console.log("Audio block by browser:", e)); 
+                audioPlayers[type].play().catch(e => console.log("Audio block:", e)); 
             } 
         }
 
@@ -618,7 +588,7 @@
         }
 
         function startGame() {
-            if(!isTestMode && !new URLSearchParams(window.location.search).has('config')) return;
+            if(!isTestMode) return;
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
             
@@ -782,7 +752,7 @@
 
         function buildTeams() {
             const panel = document.getElementById('teams-panel'); if(!panel) return; panel.innerHTML = '';
-            const tCount = (isTestMode || new URLSearchParams(window.location.search).has('config')) ? gameConfig.teams : parseInt(document.getElementById('team-count').value);
+            const tCount = isTestMode ? gameConfig.teams : parseInt(document.getElementById('team-count').value);
             for (let i = 0; i < tCount; i++) {
                 const teamCard = document.createElement('div'); teamCard.className = 'team-card'; if(i === currentTeamIndex) teamCard.classList.add('active');
                 teamCard.id = `team-card-${i}`;
@@ -881,7 +851,15 @@
             let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
             document.getElementById('question-modal').style.display = 'none'; document.getElementById('modal-interactive-area').style.pointerEvents = 'auto';
             if (activeCell && isTestMode) { activeCell.innerText = ""; activeCell.classList.add('disabled'); activeCell = null; }
-            if(isTestMode) { questionsAnswered++; if (questionsAnswered >= totalQuestions) forceEndGame(); else nextTurn(); }
+            
+            if(isTestMode) { 
+                questionsAnswered++; 
+                if (questionsAnswered >= totalQuestions) {
+                    forceEndGame(); // Вызываем финал сразу по клику пользователя
+                } else {
+                    nextTurn(); 
+                }
+            }
         }
 
         function nextTurn() {
@@ -897,7 +875,7 @@
             document.querySelectorAll('.pr-tab-btn').forEach(b => b.classList.remove('active'));
             const finalTab = Array.from(document.querySelectorAll('.pr-tab-btn')).find(b => b.innerText.includes('Финал')); if(finalTab) finalTab.classList.add('active');
 
-            // ПОКАЗЫВАЕМ ФИНАЛ И СРАЗУ ИГРАЕМ ЗВУК
+            // ПОКАЗЫВАЕМ ФИНАЛ И СРАЗУ ИГРАЕМ ЗВУК (работает, так как вызвано кликом)
             document.getElementById('final-screen').style.display = 'flex'; 
             playSound('fanfare');
             
@@ -914,30 +892,22 @@
             const lbContainer = document.getElementById('leaderboard'); lbContainer.innerHTML = '';
             results.forEach((team, index) => { lbContainer.innerHTML += `<div class="leaderboard-row"><div>#${index + 1}</div><div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; overflow:hidden;">${team.avatar}</div> ${team.name}</div><div style="color:var(--points-color); font-weight:bold;">${team.score}</div></div>`; });
 
-            if(isTestMode && !new URLSearchParams(window.location.search).has('config')) {
+            if(isTestMode) {
                 const btn = document.getElementById('btn-master-test'); btn.classList.remove('active-test'); btn.innerText = "▶ ТЕСТИРОВАТЬ ИГРУ";
                 document.querySelectorAll('.pr-tab-btn').forEach(b => { b.style.opacity = '1'; b.style.pointerEvents = 'auto'; });
                 isTestMode = false;
             }
         }
 
+        // --- УТИЛИТА ЭКРАНИРОВАНИЯ ДЛЯ SRCDOC (КЛЮЧ К ИСЧЕЗНОВЕНИЮ ССЫЛОК GITHUB) ---
+        function escForSrcdoc(html){
+            return html.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
 
         // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА ---
         function generateGameCode() {
-            const configStr = JSON.stringify(gameConfig);
-            const base64Config = btoa(unescape(encodeURIComponent(configStr)));
             
-            let baseUrl = document.getElementById('ed-base-game-url').value.trim();
-            if (!baseUrl) { alert("Пожалуйста, введите ссылку на игру (базовый URL)!"); return; }
-            if (!baseUrl.endsWith('/') && !baseUrl.includes('?')) baseUrl += '/';
-            if (!baseUrl.includes('?')) baseUrl += '?config='; else baseUrl += '&config=';
-            
-            const fullDirectUrl = baseUrl + base64Config;
-            
-            // 1. Генерируем ПРЯМОЙ Iframe
-            const iframeDirectCode = `<iframe src="${fullDirectUrl}" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-
-            // 2. Формируем чистый HTML код (только игра)
+            // 1. Формируем чистый HTML код автономной игры (никаких ссылок вовне)
             let rootStyles = `:root {
                 --font-main: ${gameConfig.style.fontMain}; --font-title: ${gameConfig.style.fontTitle};
                 --text-color: ${gameConfig.style.textColor}; --title-color: ${gameConfig.style.titleColor};
@@ -1077,14 +1047,12 @@
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
             
+            // Жесткая загрузка всех звуков при стартовом клике для снятия блокировки
             audioPlayers['click'] = new Audio(gameConfig.sounds.click);
             audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
             audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
             audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
-            
-            for(let key in audioPlayers) {
-                audioPlayers[key].load();
-            }
+            for(let key in audioPlayers) { audioPlayers[key].load(); }
 
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
             document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
@@ -1207,7 +1175,13 @@
             let n = document.querySelector('.btn-next-arrow'); if(n) n.remove();
             document.getElementById('question-modal').style.display = 'none'; document.getElementById('modal-interactive-area').style.pointerEvents = 'auto';
             if (activeCell) { activeCell.innerText = ""; activeCell.classList.add('disabled'); activeCell = null; }
-            questionsAnswered++; if (questionsAnswered >= totalQuestions) forceEndGame(); else nextTurn();
+            
+            questionsAnswered++; 
+            if (questionsAnswered >= totalQuestions) {
+                forceEndGame(); // Финал запускается прямо по клику на кнопку "Продолжить"
+            } else { 
+                nextTurn(); 
+            }
         }
 
         function nextTurn() {
@@ -1220,6 +1194,7 @@
             document.getElementById('game-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
             
+            // Показываем финал и сразу играем звук, браузер не заблокирует, так как это прямое продолжение клика
             document.getElementById('final-screen').style.display = 'flex'; 
             playSound('fanfare');
             
@@ -1243,6 +1218,10 @@
     <\/script>
 </body>
 </html>`;
+
+            // 2. Генерируем Iframe на основе атрибута srcdoc. 
+            // Это 100% скрывает пути к GitHub. Весь HTML встраивается в iframe.
+            const iframeDirectCode = `<iframe width="100%" height="100%" style="border:0;" allow="autoplay; fullscreen" srcdoc='${escForSrcdoc(fullHTML)}'></iframe>`;
 
             document.getElementById('out-html').value = fullHTML;
             document.getElementById('out-iframe-direct').value = iframeDirectCode;
