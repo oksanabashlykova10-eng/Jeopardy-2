@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,10 +76,12 @@ HTML
         .radio-group input { width: auto; margin: 0; cursor: pointer;}
 
         .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .preset-item { height: 60px; border-radius: 5px; border: 2px solid #ddd; cursor: pointer; background-size: cover; background-position: center; transition: 0.2s; position: relative;}
+        .preset-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .preset-item { height: 60px; border-radius: 5px; border: 2px solid #ddd; cursor: pointer; background-size: cover; background-position: center; transition: 0.2s; position: relative; background-color: #222;}
         .preset-item:hover { transform: scale(1.05); }
         .preset-item.active { border-color: #00ffff; box-shadow: 0 0 10px #00ffff; }
         .preset-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.65rem; text-align: center; padding: 3px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;}
+        .preset-item-cup { background-size: contain; background-repeat: no-repeat; height: 80px; }
 
         .question-block { border: 2px solid #34495e; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fafafa; }
         .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #2c3e50; padding-bottom: 5px;}
@@ -185,16 +186,15 @@ HTML
 
         /* Экран 4: Финал */
         #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
-        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center;}
-        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; }
-        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color);}
-        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color);}
+        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center; position: relative; z-index: 2;}
+        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; position: relative; z-index: 2;}
+        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2;}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color); position: relative; z-index: 2;}
     </style>
 </head>
 <body id="body-tag">
 
     <div id="app-container">
-        <!-- ЛЕВАЯ ЧАСТЬ: РЕДАКТОР -->
         <div id="editor-ui">
             <div class="editor-header">
                 <img src="https://img.genially.com/67961b32a116fb001568a75e/673752a5-8d4d-40d1-9b5f-f04ebd91a27c.png" class="logo-img" alt="Logo">
@@ -211,19 +211,19 @@ HTML
             </div>
             
             <div class="editor-content">
-                <!-- Вкладка: Заставка -->
                 <div id="tab-start" class="ed-pane active">
                     <h3>Фон заставки</h3>
                     <div class="preset-grid" id="preset-grid-start"></div>
                     <div class="form-group">
                         <label>Свой фон (URL/Файл)</label>
+                        <span style="font-size:0.75rem; color:#f44336; display:block; margin-bottom:5px; font-weight:bold;">* Размер своей картинки не более 5 МБ!</span>
                         <input type="text" placeholder="https://..." onchange="updateBg('start', this.value, true)">
-                        <input type="file" accept="image/*" onchange="handleFile(this, val => updateBg('start', val, true))">
+                        <input type="file" accept="image/*" onchange="handleBgFile(this, 'start')">
                     </div>
                     <h3>Название игры</h3>
                     <div class="form-group">
                         <input type="text" id="ed-title-text" value="Geopardy" oninput="document.getElementById('drag-title-text').innerText = this.value; gameConfig.title = this.value;">
-                        <p style="font-size: 0.75rem; color: #666;">* Перемещайте заголовок и панель команд мышкой. Тяните за правый нижний угол, чтобы изменить размер.</p>
+                        <p style="font-size: 0.75rem; color: #666;">* Перемещайте заголовок и панель команд мышкой. Тяните за правый нижний угол, чтобы изменять размер <b>по горизонтали и вертикали</b>.</p>
                     </div>
                     <h3>Подложки (Заголовок, панель)</h3>
                     <div class="form-group">
@@ -238,7 +238,6 @@ HTML
                     </div>
                 </div>
 
-                <!-- Вкладка: Игровое поле -->
                 <div id="tab-board" class="ed-pane">
                     <h3>Фон Игрового поля (Сетка)</h3>
                     <div class="form-group">
@@ -257,7 +256,10 @@ HTML
                     <div class="preset-grid" id="preset-grid-modal"></div>
                     <div class="form-group">
                         <label>Свой фон (URL/Файл)</label>
+                        <span style="font-size:0.75rem; color:#f44336; display:block; margin-bottom:5px; font-weight:bold;">* Размер своей картинки не более 5 МБ!</span>
                         <input type="text" placeholder="URL картинки..." onchange="updateBg('modal', this.value, true)">
+                        <input type="file" accept="image/*" onchange="handleBgFile(this, 'modal')" style="margin-bottom: 10px;">
+                        
                         <label style="margin-top: 15px;">Затемнение фона (0 - 100%)</label>
                         <input type="range" min="0" max="100" value="60" oninput="gameConfig.style.modalOverlayOpacity = this.value / 100; applyConfigStyles();">
                         <label style="margin-top: 15px;">Цвет самой плашки (рамки) вопроса</label>
@@ -277,7 +279,6 @@ HTML
                     <div class="form-group" id="ed-categories-box"></div>
                 </div>
 
-                <!-- Вкладка: ВОПРОСЫ -->
                 <div id="tab-questions" class="ed-pane">
                     <h3>Редактор вопросов</h3>
                     <div class="smart-hint">
@@ -289,7 +290,6 @@ HTML
                     <div id="questions-editor-container"></div>
                 </div>
 
-                <!-- Вкладка: Медиа -->
                 <div id="tab-media" class="ed-pane">
                     <h3>Аватарки команд</h3>
                     <div class="form-group">
@@ -300,41 +300,51 @@ HTML
                             <option value="monsters">Монстрики</option>
                             <option value="xmas">Новый Год (Зима)</option>
                             <option value="adventure">Приключения</option>
+                            <option value="fruits">Фрукты</option>
+                            <option value="vegetables">Овощи</option>
+                            <option value="toys">Игрушки</option>
+                            <option value="halloween">Хэллоуин</option>
                         </select>
                     </div>
                     <div class="form-group" id="ed-avatars-box"></div>
-                    <h3>Награда Победителю (Кубок)</h3>
-                    <div class="form-group"><input type="text" id="ed-cup-url" placeholder="https://..." onchange="updateCup(this.value)"></div>
-                    <h3>Настройка звуков</h3>
+                    
+                    <h3>Финал (Кубок, Салют, Звук)</h3>
                     <div class="form-group">
-                        <label>Клик по карточке</label>
-                        <select id="ed-snd-click" onchange="updateConfigSounds()">
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3">Мягкий клик</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3">Щелчок</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3">Кнопка</option>
+                        <label>Звук победы</label>
+                        <select id="ed-win-sound" onchange="gameConfig.winSoundStyle = this.value">
+                            <option value="epic">Эпичные фанфары (По умолчанию)</option>
+                            <option value="arcade">Аркадная победа (Ретро)</option>
+                            <option value="bell">Магический звон (Мягкий)</option>
                         </select>
-                        <label>Правильный ответ</label>
-                        <select id="ed-snd-correct" onchange="updateConfigSounds()">
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3">Колокольчик</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3">Магический успех</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3">Аркада победа</option>
+                        
+                        <label style="margin-top:15px;" class="radio-group">
+                            <input type="checkbox" id="ed-fw-enable" checked onchange="gameConfig.fireworksEnabled = this.checked"> Включить салют при победе
+                        </label>
+                        <label style="margin-top:5px;">Режим салюта</label>
+                        <select id="ed-fw-mode" onchange="gameConfig.fireworkMode = this.value; toggleFwColor();">
+                            <option value="multi">Разноцветный (Multi)</option>
+                            <option value="single">Однотонный (Single)</option>
                         </select>
-                        <label>Неправильный ответ</label>
-                        <select id="ed-snd-wrong" onchange="updateConfigSounds()">
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3">Легкая ошибка</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3">Глухой стук</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/3112/3112-preview.mp3">Короткий Buzz</option>
-                        </select>
-                        <label>Финал (Победа)</label>
-                        <select id="ed-snd-fanfare" onchange="updateConfigSounds()">
-                            <option value="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3">Эпичная победа</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3">Торжественные фанфары</option>
-                            <option value="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3">Уровень пройден</option>
-                        </select>
+                        <div id="fw-color-wrap" style="display:none; margin-top:10px;">
+                            <label>Цвет однотонного салюта:</label>
+                            <div class="flex-row">
+                                <input type="color" id="ed-fw-color" value="#ff0000" onchange="gameConfig.fireworkColor = this.value">
+                                <span style="font-size: 0.8rem;">Выберите цвет</span>
+                            </div>
+                        </div>
+
+                        <label style="margin-top:15px;">Кубок Победителя</label>
+                        <div class="preset-grid-3" id="preset-grid-cups"></div>
+                        <div class="flex-row" style="margin-top:10px; flex-wrap:wrap;">
+                            <input type="text" id="ed-cup-url" placeholder="URL кубка..." style="width:100%;" onchange="updateCup(this.value)">
+                            <div class="flex-row" style="width:100%;">
+                                <span style="font-size:0.8rem; font-weight:bold;">Свое изображение (до 2МБ):</span>
+                                <input type="file" accept="image/*" onchange="handleCupFile(this)">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Вкладка: Шрифты -->
                 <div id="tab-design" class="ed-pane">
                     <h3>Настройка текста (Вопросы, Кнопки)</h3>
                     <div class="form-group">
@@ -378,11 +388,8 @@ HTML
                     </div>
                 </div>
 
-                <!-- Вкладка: ЭКСПОРТ ИГРЫ -->
                 <div id="tab-export" class="ed-pane">
                     
-                    <!-- ПОЛЕ GITHUB ПОЛНОСТЬЮ УДАЛЕНО -->
-
                     <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД ИГРЫ</button>
                     
                     <div id="export-result" style="display:none;">
@@ -410,7 +417,6 @@ HTML
             </div>
         </div>
 
-        <!-- ПРАВАЯ ЧАСТЬ: ПРЕДПРОСМОТР ИГРЫ -->
         <div id="preview-area">
             
             <div id="preview-tabs">
@@ -457,7 +463,7 @@ HTML
                 <div id="final-screen">
                     <h1 class="final-title" id="winner-title">Team 1 Wins!</h1>
                     <div class="final-subtitle" id="winner-subtitle">Congratulations!</div>
-                    <img id="reward-image" src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80">
+                    <img id="reward-image" src="https://img.genially.com/67961b32a116fb001568a75e/e5361f30-22f7-4b94-aea3-da878777e63a.png">
                     <div class="underlay-box" id="leaderboard"></div>
                 </div>
 
@@ -474,14 +480,18 @@ HTML
         let isTestMode = false;
         let gameConfig = {
             title: "Geopardy", 
-            titleX: 0, titleY: -220, titleScale: 1, 
-            teamX: 0, teamY: 150, teamScale: 1, 
+            titleX: 0, titleY: -220, titleScaleX: 1, titleScaleY: 1, 
+            teamX: 0, teamY: 150, teamScaleX: 1, teamScaleY: 1, 
             points: [100, 200, 300, 400, 500],
             categories: ["Grammar", "Vocabulary", "Reading", "Speaking", "Bonus"],
             colColors: ["#ff9800", "#4caf50", "#9c27b0", "#2196f3", "#f44336"],
             avatars: ["🦊", "🐰", "🦁", "🐼"], 
-            cupImg: "https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=400&q=80",
+            cupImg: "https://img.genially.com/67961b32a116fb001568a75e/e5361f30-22f7-4b94-aea3-da878777e63a.png",
             teams: 4,
+            winSoundStyle: 'epic',
+            fireworksEnabled: true,
+            fireworkMode: 'multi',
+            fireworkColor: '#ff0000',
             sounds: { click: "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3", correct: "https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3", wrong: "https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3", fanfare: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" },
             questions: [],
             bulkMode: [false, false, false, false, false], 
@@ -518,51 +528,146 @@ HTML
             { name: "Универсал 1", url: "https://img.genially.com/67961b32a116fb001568a75e/cae6367b-4db3-4761-912c-7a5080701a44.png" },
             { name: "Универсал 2", url: "https://img.genially.com/67961b32a116fb001568a75e/66fd3c13-ad93-4f69-8a6c-d6076da466f0.png" }
         ];
+        const presetLinksCups = [
+            { name: "Кубок 1", url: "https://img.genially.com/67961b32a116fb001568a75e/e5361f30-22f7-4b94-aea3-da878777e63a.png" },
+            { name: "Кубок 2", url: "https://img.genially.com/67961b32a116fb001568a75e/150b6c79-7c23-49dc-957e-3cedc1e5e2c5.png" },
+            { name: "Кубок 3", url: "https://img.genially.com/67961b32a116fb001568a75e/8b386ca3-9ac0-49dc-95e4-1f174d9a6977.png" },
+            { name: "Кубок 4", url: "https://img.genially.com/67961b32a116fb001568a75e/2979e9fd-eadc-431c-b28a-7c7c846e83d4.png" },
+            { name: "Кубок 5", url: "https://img.genially.com/67961b32a116fb001568a75e/0f37f9c1-db4f-4fae-b293-cd5e83b8e124.png" },
+            { name: "Кубок 6", url: "https://img.genially.com/67961b32a116fb001568a75e/2963c53f-d09e-4a69-8515-bbc8ebdf5ba4.png" }
+        ];
 
         let mockTypeIndex = 0; let scores = []; let currentTeamIndex = 0; let questionsAnswered = 0; const totalQuestions = 25; 
         let activeCell = null; let currentPoints = 0; let currentActiveCol = 0; let currentActiveRow = 0; 
+        
         let audioPlayers = {}; 
+        let AC = null;
+        function audioCtx() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); return AC; }
+
+        // --- ЛОГИКА ЗВУКА И САЛЮТА (WEB AUDIO API) ---
+        function beep({freq=440, dur=0.12, type="sine", vol=0.1, slide=0, when=0}) {
+            try {
+                const ctx = audioCtx(); const t0 = ctx.currentTime + when;
+                const o = ctx.createOscillator(); const g = ctx.createGain();
+                o.type = type; o.frequency.setValueAtTime(freq, t0);
+                if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, freq * slide), t0 + dur);
+                g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+                o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+            } catch(e) {}
+        }
+        function sfxFirework() {
+            try {
+                const ctx = audioCtx(); const t0 = ctx.currentTime;
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, t0); osc.frequency.exponentialRampToValueAtTime(50, t0 + 0.3);
+                gain.gain.setValueAtTime(0.5, t0); gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.4);
+                osc.connect(gain).connect(ctx.destination); osc.start(t0); osc.stop(t0 + 0.5);
+
+                const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain();
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(80, t0); osc2.frequency.exponentialRampToValueAtTime(20, t0 + 0.4);
+                gain2.gain.setValueAtTime(0.3, t0); gain2.gain.exponentialRampToValueAtTime(0.01, t0 + 0.5);
+                osc2.connect(gain2).connect(ctx.destination); osc2.start(t0); osc2.stop(t0 + 0.6);
+            } catch(e) {}
+        }
+        function sfxWinEpic() { 
+            beep({freq: 392, type: "square", dur: 0.15, vol: 0.15}); beep({freq: 523, type: "square", dur: 0.15, vol: 0.15, when: 0.15}); 
+            beep({freq: 659, type: "square", dur: 0.15, vol: 0.15, when: 0.30}); beep({freq: 783, type: "square", dur: 0.60, vol: 0.15, when: 0.45}); 
+        }
+        function sfxWinArcade() {
+            [261, 329, 392, 523, 659, 783, 1046].forEach((f, i) => { beep({freq: f, type: "square", dur: 0.1, vol: 0.1, when: i * 0.1}); });
+            beep({freq: 1046, type: "square", dur: 0.5, vol: 0.1, when: 0.7});
+        }
+        function sfxWinBell() {
+            beep({freq: 440, type: "sine", dur: 0.2, vol: 0.1}); beep({freq: 554, type: "sine", dur: 0.2, vol: 0.1, when: 0.2});
+            beep({freq: 659, type: "sine", dur: 0.2, vol: 0.1, when: 0.4}); beep({freq: 880, type: "sine", dur: 1.0, vol: 0.1, slide: 0.9, when: 0.6});
+        }
+        function playWinSound() {
+            if (gameConfig.winSoundStyle === 'arcade') sfxWinArcade(); else if (gameConfig.winSoundStyle === 'bell') sfxWinBell(); else sfxWinEpic();
+        }
+
+        function launchFireworks(mode, singleColor) {
+            if (!gameConfig.fireworksEnabled || mode === 'none') return;
+            const container = document.getElementById('play-mode') || document.body;
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed'; canvas.style.top = '0'; canvas.style.left = '0'; canvas.style.width = '100%'; canvas.style.height = '100%';
+            canvas.style.zIndex = '9999'; canvas.style.pointerEvents = 'none';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let particles = []; const multiColors = ['#FFD700', '#FFA500', '#00FFFF', '#FF0000', '#00FF00']; 
+            
+            function createBurst(x, y) {
+                sfxFirework();
+                const count = 100;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2; const speed = Math.random() * 5 + 2;
+                    const color = mode === 'multi' ? multiColors[Math.floor(Math.random() * multiColors.length)] : singleColor;
+                    particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, color: color, decay: Math.random() * 0.015 + 0.015 });
+                }
+            }
+
+            let burstsFired = 0; const totalBursts = 7;
+            function scheduleNextBurst() {
+                if (burstsFired >= totalBursts) return;
+                const x = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1); const y = Math.random() * (canvas.height * 0.5) + (canvas.height * 0.1);
+                createBurst(x, y); burstsFired++;
+                if (burstsFired < totalBursts) setTimeout(scheduleNextBurst, Math.random() * 300 + 200);
+            }
+            scheduleNextBurst();
+            
+            let animationId;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i]; if (p.alpha <= 0) continue;
+                    alive = true; p.vy += 0.05; p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
+                    ctx.globalAlpha = Math.max(0, p.alpha); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
+                }
+                if (!alive && burstsFired >= totalBursts) { cancelAnimationFrame(animationId); if (canvas.parentNode) canvas.parentNode.removeChild(canvas); } 
+                else { animationId = requestAnimationFrame(animate); }
+            }
+            animate();
+        }
+
+        function toggleFwColor() { document.getElementById('fw-color-wrap').style.display = document.getElementById('ed-fw-mode').value === 'single' ? 'block' : 'none'; }
 
         // Инициализация
-        window.onload = () => {
-            initEditorMode();
-        };
+        window.onload = () => { initEditorMode(); };
 
         function initEditorMode() {
-            initPresets(); initCategoriesAndAvatars(); updateUnderlay(); applyConfigStyles(); buildBoard(); buildTeams(); initDraggableItems(); renderQuestionsForms();
+            initPresets(); initCupPresets(); initCategoriesAndAvatars(); updateUnderlay(); applyConfigStyles(); buildBoard(); buildTeams(); initDraggableItems(); renderQuestionsForms();
             document.getElementById('start-screen').style.display = 'flex'; document.getElementById('game-screen').style.display = 'none';
         }
 
         function playSound(type) { 
-            if (audioPlayers[type]) { 
-                audioPlayers[type].currentTime = 0;
-                audioPlayers[type].play().catch(e => console.log("Audio block:", e)); 
-            } 
+            if (audioPlayers[type]) { audioPlayers[type].currentTime = 0; audioPlayers[type].play().catch(e => console.log("Audio block:", e)); } 
         }
 
         function initDraggableItems() {
-            makeDraggable('drag-title-container', 'title-resizer', 'titleX', 'titleY', 'titleScale');
-            makeDraggable('drag-team-container', 'team-resizer', 'teamX', 'teamY', 'teamScale');
-            document.getElementById('drag-title-container').style.transform = `translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale})`;
-            document.getElementById('drag-team-container').style.transform = `translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale})`;
+            makeDraggable('drag-title-container', 'title-resizer', 'titleX', 'titleY', 'titleScaleX', 'titleScaleY');
+            makeDraggable('drag-team-container', 'team-resizer', 'teamX', 'teamY', 'teamScaleX', 'teamScaleY');
+            document.getElementById('drag-title-container').style.transform = `translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScaleX}, ${gameConfig.titleScaleY})`;
+            document.getElementById('drag-team-container').style.transform = `translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScaleX}, ${gameConfig.teamScaleY})`;
         }
 
-        function makeDraggable(containerId, resizerId, varX, varY, varScale) {
+        function makeDraggable(containerId, resizerId, varX, varY, varScaleX, varScaleY) {
             const el = document.getElementById(containerId); const res = document.getElementById(resizerId);
-            let isDragging = false, isResizing = false; let startX, startY, initX, initY, initScale;
-            res.onmousedown = (e) => { isResizing = true; e.stopPropagation(); startX = e.clientX; initScale = gameConfig[varScale]; };
+            let isDragging = false, isResizing = false; let startX, startY, initX, initY, initScaleX, initScaleY;
+            res.onmousedown = (e) => { isResizing = true; e.stopPropagation(); startX = e.clientX; startY = e.clientY; initScaleX = gameConfig[varScaleX]; initScaleY = gameConfig[varScaleY]; };
             el.onmousedown = (e) => {
                 if(e.target === res || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
                 isDragging = true; startX = e.clientX; startY = e.clientY; initX = gameConfig[varX]; initY = gameConfig[varY];
             };
             window.addEventListener('mousemove', (e) => {
                 if(isResizing) {
-                    let newScale = initScale + ((e.clientX - startX) * 0.01);
-                    if(newScale < 0.3) newScale = 0.3; if(newScale > 3) newScale = 3;
-                    gameConfig[varScale] = newScale; el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${gameConfig[varScale]})`;
+                    let newScaleX = initScaleX + ((e.clientX - startX) * 0.005);
+                    let newScaleY = initScaleY + ((e.clientY - startY) * 0.005);
+                    if(newScaleX < 0.3) newScaleX = 0.3; if(newScaleY < 0.3) newScaleY = 0.3;
+                    gameConfig[varScaleX] = newScaleX; gameConfig[varScaleY] = newScaleY;
+                    el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${newScaleX}, ${newScaleY})`;
                 } else if(isDragging) {
                     gameConfig[varX] = initX + (e.clientX - startX); gameConfig[varY] = initY + (e.clientY - startY);
-                    el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${gameConfig[varScale]})`;
+                    el.style.transform = `translate(${gameConfig[varX]}px, ${gameConfig[varY]}px) scale(${gameConfig[varScaleX]}, ${gameConfig[varScaleY]})`;
                 }
             });
             window.addEventListener('mouseup', () => { isDragging = false; isResizing = false; });
@@ -589,18 +694,15 @@ HTML
 
         function startGame() {
             if(!isTestMode) return;
+            try { audioCtx().resume(); } catch(e) {} // РАЗБЛОКИРОВКА АУДИОКОНТЕКСТА
+            
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
             
-            // Жесткая инициализация звуков при первом клике (старте игры)
             audioPlayers['click'] = new Audio(gameConfig.sounds.click);
             audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
             audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
-            audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
-            
-            for(let key in audioPlayers) {
-                audioPlayers[key].load();
-            }
+            for(let key in audioPlayers) { audioPlayers[key].load(); }
 
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
             document.getElementById('in-game-controls').style.display = 'flex'; buildBoard(); buildTeams();
@@ -614,7 +716,11 @@ HTML
             if(mode === 'start') document.getElementById('start-screen').style.display = 'flex';
             if(mode === 'game') { document.getElementById('game-screen').style.display = 'flex'; buildBoard(); buildTeams(); }
             if(mode === 'question') { document.getElementById('question-modal').style.display = 'flex'; showMockModalForTab(); }
-            if(mode === 'final') { document.getElementById('final-screen').style.display = 'flex'; }
+            if(mode === 'final') { 
+                document.getElementById('final-screen').style.display = 'flex'; 
+                launchFireworks(gameConfig.fireworkMode, gameConfig.fireworkColor);
+                playWinSound();
+            }
         }
 
         function copyCode(id, btnElement) {
@@ -629,9 +735,51 @@ HTML
             const gridStart = document.getElementById('preset-grid-start'); presetLinksStart.forEach((p, i) => { gridStart.innerHTML += `<div class="preset-item ${i===0?'active':''}" style="background-image: url('${p.url}')" onclick="setPreset('start', this, '${p.url}')"><div class="preset-label">${p.name}</div></div>`; });
             const gridModal = document.getElementById('preset-grid-modal'); presetLinksModal.forEach((p, i) => { gridModal.innerHTML += `<div class="preset-item ${i===0?'active':''}" style="background-image: url('${p.url}')" onclick="setPreset('modal', this, '${p.url}')"><div class="preset-label">${p.name}</div></div>`; });
         }
+        function initCupPresets() {
+            const grid = document.getElementById('preset-grid-cups');
+            presetLinksCups.forEach((p, i) => { grid.innerHTML += `<div class="preset-item preset-item-cup ${gameConfig.cupImg === p.url ? 'active':''}" style="background-image: url('${p.url}')" onclick="setCupPreset(this, '${p.url}')"><div class="preset-label">${p.name}</div></div>`; });
+        }
+        function setCupPreset(btn, url) {
+            document.querySelectorAll('.preset-item-cup').forEach(el => el.classList.remove('active')); btn.classList.add('active'); 
+            updateCup(url); document.getElementById('ed-cup-url').value = url;
+        }
+        
+        function handleBgFile(input, target) {
+            if (input.files && input.files[0]) {
+                if (input.files[0].size > 5 * 1024 * 1024) { alert('Файл слишком большой! Максимум 5 МБ.'); input.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = e => updateBg(target, e.target.result, true);
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function handleCupFile(input) {
+            if (input.files && input.files[0]) {
+                if (input.files[0].size > 2 * 1024 * 1024) { alert('Файл слишком большой! Максимум 2 МБ.'); input.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = e => { updateCup(e.target.result); document.getElementById(`ed-cup-url`).value = 'Свой файл'; document.querySelectorAll('.preset-item-cup').forEach(el => el.classList.remove('active')); };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function handleAvaFile(i, input) {
+            if (input.files && input.files[0]) {
+                if (input.files[0].size > 1 * 1024 * 1024) { alert('Файл слишком большой! Максимум 1 МБ.'); input.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = e => { updateAva(i, e.target.result); document.getElementById(`ed-ava-input-${i}`).value = 'Свое изображение'; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function handleQFile(input, c, r) {
+            if (input.files && input.files[0]) {
+                if (input.files[0].size > 2 * 1024 * 1024) { alert('Файл слишком большой! Максимум 2 МБ.'); input.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = e => { updateQData(c, r, 'mediaUrl', e.target.result); document.getElementById('media-url-'+c+'-'+r).value = 'Файл загружен'; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function setPreset(target, btn, url) { btn.parentElement.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active')); btn.classList.add('active'); updateBg(target, `url('${url}')`, false); }
         function updateBg(target, val, rem) {
-            let cssVal = val; if(!val.startsWith('url') && !val.startsWith('#') && !val.startsWith('linear')) cssVal = `url('${val}')`;
+            let cssVal = val; if(!val.startsWith('url') && !val.startsWith('#') && !val.startsWith('linear') && !val.startsWith('data:')) cssVal = `url('${val}')`;
             if(target === 'start') { gameConfig.style.bgStartImg = cssVal; }
             if(target === 'modal') { gameConfig.style.bgModalImg = cssVal; }
             applyConfigStyles();
@@ -648,7 +796,6 @@ HTML
             root.setProperty('--bg-modal-img', gameConfig.style.bgModalImg); root.setProperty('--modal-overlay-opacity', gameConfig.style.modalOverlayOpacity);
             root.setProperty('--modal-box-bg', gameConfig.style.modalBoxBg); root.setProperty('--underlay-bg', gameConfig.style.underlayBg); root.setProperty('--underlay-neon', gameConfig.style.underlayNeon);
         }
-        function handleFile(input, callback) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => callback(e.target.result); reader.readAsDataURL(input.files[0]); } }
         function updatePoints() { for(let i=0; i<5; i++) { gameConfig.points[i] = document.getElementById(`ed-pt-${i}`).value; } buildBoard(); renderQuestionsForms(); }
         function updateFonts() { 
             gameConfig.style.fontMain = document.getElementById('ed-font-main').value; gameConfig.style.fontTitle = document.getElementById('ed-font-title').value; 
@@ -656,13 +803,27 @@ HTML
             gameConfig.style.baseFontSize = document.getElementById('ed-text-size').value + 'rem'; gameConfig.style.titleFontScale = document.getElementById('ed-title-size').value;
             applyConfigStyles();
         }
-        function updateConfigSounds() { const t = ['click', 'correct', 'wrong', 'fanfare']; t.forEach(k => { gameConfig.sounds[k] = document.getElementById(`ed-snd-${k}`).value; }); }
         
         function initCategoriesAndAvatars() {
             const catBox = document.getElementById('ed-categories-box'); catBox.innerHTML = '';
             for(let i=0; i<5; i++) { catBox.innerHTML += `<div class="flex-row"><input type="color" value="${gameConfig.colColors[i]}" onchange="updateCat(${i}, 'color', this.value)"><input type="text" value="${gameConfig.categories[i]}" onchange="updateCat(${i}, 'text', this.value)"></div>`; }
             const avaBox = document.getElementById('ed-avatars-box'); avaBox.innerHTML = '';
-            for(let i=0; i<4; i++) { avaBox.innerHTML += `<div style="margin-bottom:15px;"><label>Команда ${i+1}</label><div class="flex-row"><div id="prev-ava-${i}" style="width:40px; height:40px; border-radius:50%; border:2px solid #ccc; overflow:hidden; background:#222;"></div><input type="text" id="ed-ava-input-${i}" value="${gameConfig.avatars[i]}" onchange="updateAva(${i}, this.value)" style="flex-grow:1;"></div></div>`; renderAvaPreview(i, gameConfig.avatars[i]); }
+            for(let i=0; i<4; i++) { 
+                avaBox.innerHTML += `<div style="margin-bottom:15px; border-bottom:1px solid #ddd; padding-bottom:10px;">
+                    <label style="color:#00bcd4;">Команда ${i+1}</label>
+                    <div class="flex-row" style="align-items: flex-start;">
+                        <div id="prev-ava-${i}" style="width:50px; height:50px; border-radius:50%; border:2px solid #ccc; overflow:hidden; background:#222; flex-shrink:0;"></div>
+                        <div style="flex-grow:1;">
+                            <input type="text" id="ed-ava-input-${i}" value="${gameConfig.avatars[i]}" onchange="updateAva(${i}, this.value)" placeholder="URL картинки или эмодзи" style="margin-bottom:5px;">
+                            <div class="flex-row" style="margin:0;">
+                                <span style="font-size:0.75rem; font-weight:bold; white-space:nowrap;">Своя картинка (до 1МБ):</span>
+                                <input type="file" accept="image/*" onchange="handleAvaFile(${i}, this)" style="margin:0;">
+                            </div>
+                        </div>
+                    </div>
+                </div>`; 
+                renderAvaPreview(i, gameConfig.avatars[i]); 
+            }
         }
         
         function applyAvatarTheme(theme) { 
@@ -670,6 +831,10 @@ HTML
             else if(theme === 'robots') gameConfig.avatars = ["🤖", "🦾", "🦿", "🔋"]; 
             else if(theme === 'xmas') gameConfig.avatars = ["🎄", "🎅", "🎁", "❄️"];
             else if(theme === 'adventure') gameConfig.avatars = ["🧭", "🗺️", "🏴‍☠️", "💎"];
+            else if(theme === 'fruits') gameConfig.avatars = ["🍎", "🍌", "🍇", "🍓"];
+            else if(theme === 'vegetables') gameConfig.avatars = ["🥕", "🥦", "🍅", "🌽"];
+            else if(theme === 'toys') gameConfig.avatars = ["🧸", "🚂", "🪁", "🪀"];
+            else if(theme === 'halloween') gameConfig.avatars = ["🎃", "👻", "🦇", "🧛"];
             else gameConfig.avatars = ["👾", "👽", "👹", "👻"]; 
             for(let i=0; i<4; i++) { document.getElementById(`ed-ava-input-${i}`).value = gameConfig.avatars[i]; renderAvaPreview(i, gameConfig.avatars[i]); } 
             buildTeams(); 
@@ -678,6 +843,7 @@ HTML
         function updateCat(i, type, val) { if(type === 'color') gameConfig.colColors[i] = val; if(type === 'text') gameConfig.categories[i] = val; buildBoard(); renderQuestionsForms(); }
         function updateAva(i, val) { gameConfig.avatars[i] = val; renderAvaPreview(i, val); buildTeams(); }
         function updateCup(val) { gameConfig.cupImg = val; document.getElementById('reward-image').src = val; }
+        
         function renderAvaPreview(i, val) { document.getElementById(`prev-ava-${i}`).innerHTML = (!val.startsWith('http') && !val.startsWith('data:')) ? `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">${val}</div>` : `<img src="${val}" style="width:100%;height:100%;object-fit:cover;">`; }
 
         function renderQuestionsForms() {
@@ -704,9 +870,9 @@ HTML
                                             <select style="width:30%; margin:0;" onchange="updateQData(${c}, ${r}, 'mediaType', this.value)"><option value="image" ${q.mediaType === 'image' ? 'selected' : ''}>Картинка</option><option value="audio" ${q.mediaType === 'audio' ? 'selected' : ''}>Аудио</option></select>
                                             <input type="text" style="width:65%; margin:0;" placeholder="URL файла" value="${q.mediaUrl}" id="media-url-${c}-${r}" onchange="updateQData(${c}, ${r}, 'mediaUrl', this.value)">
                                             <div style="width:100%; display:flex; align-items:center; gap:10px; margin-top:5px;">
-                                                <span style="font-size:0.8rem; font-weight:bold;">С компьютера:</span><input type="file" accept="image/*, audio/*" style="flex-grow:1; margin:0;" onchange="handleFile(this, val => { updateQData(${c}, ${r}, 'mediaUrl', val); document.getElementById('media-url-${c}-${r}').value = 'Файл загружен'; })">
+                                                <span style="font-size:0.7rem; color:#f44336; width:100%; font-weight:bold;">* Картинки не более 2 МБ!</span>
+                                                <input type="file" accept="image/*, audio/*" style="flex-grow:1; margin:0;" onchange="handleQFile(this, ${c}, ${r})">
                                             </div>
-                                            <span style="font-size:0.7rem; color:#f44336; width:100%;">*Картинки до 500КБ!</span>
                                           </div>`;
                         }
                         catWrap.innerHTML = innerHtml; block.appendChild(catWrap);
@@ -742,6 +908,7 @@ HTML
                     const hex = gameConfig.colColors[col]; cell.style.setProperty('--col-color', hex); cell.style.setProperty('--col-color-transparent', hex + '33');
                     cell.onclick = function() {
                         if (this.classList.contains('disabled')) return;
+                        try { audioCtx().resume(); } catch(e) {} // РАЗБЛОКИРОВКА
                         playSound('click'); activeCell = this; currentPoints = parseInt(gameConfig.points[row]);
                         openRealModal(gameConfig.categories[col], currentPoints, hex, col, row);
                     };
@@ -809,12 +976,12 @@ HTML
             document.getElementById('question-modal').style.display = 'flex';
         }
 
-        function showMockModalForTab() { openRealModal(gameConfig.categories[mockTypeIndex], gameConfig.points[0], gameConfig.colColors[mockTypeIndex], mockTypeIndex, 0); mockTypeIndex = (mockTypeIndex + 1) % 5; }
-
         function answerLogic(isCorrect, el) {
             document.getElementById('modal-interactive-area').style.pointerEvents = 'none';
             const overlay = document.getElementById('result-overlay'); overlay.style.opacity = '1';
             let q = gameConfig.questions[currentActiveCol][currentActiveRow];
+            
+            try { audioCtx().resume(); } catch(e) {}
 
             if(isCorrect) {
                 playSound('correct'); overlay.style.background = 'var(--correct-color)'; overlay.innerHTML = '✓'; overlay.style.color = '#000';
@@ -855,7 +1022,7 @@ HTML
             if(isTestMode) { 
                 questionsAnswered++; 
                 if (questionsAnswered >= totalQuestions) {
-                    forceEndGame(); // Вызываем финал сразу по клику пользователя
+                    forceEndGame();
                 } else {
                     nextTurn(); 
                 }
@@ -869,17 +1036,19 @@ HTML
         }
 
         function forceEndGame() {
-            document.getElementById('game-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
+            try { audioCtx().resume(); } catch(e) {} 
             
-            document.querySelectorAll('.pr-tab-btn').forEach(b => b.classList.remove('active'));
-            const finalTab = Array.from(document.querySelectorAll('.pr-tab-btn')).find(b => b.innerText.includes('Финал')); if(finalTab) finalTab.classList.add('active');
-
-            // ПОКАЗЫВАЕМ ФИНАЛ И СРАЗУ ИГРАЕМ ЗВУК (работает, так как вызвано кликом)
+            playWinSound();
+            
+            document.getElementById('game-screen').style.display = 'none'; 
+            document.getElementById('question-modal').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none'; 
+            document.getElementById('in-game-controls').style.display = 'none';
+            
             document.getElementById('final-screen').style.display = 'flex'; 
-            playSound('fanfare');
-            
             document.getElementById('reward-image').src = gameConfig.cupImg;
+            
+            launchFireworks(gameConfig.fireworkMode, gameConfig.fireworkColor);
 
             let results = [];
             for (let i = 0; i < gameConfig.teams; i++) { results.push({ id: i, name: `Team ${i + 1}`, score: scores[i], avatar: (!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">${gameConfig.avatars[i]}</div>` : `<img src="${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">` }); }
@@ -899,15 +1068,11 @@ HTML
             }
         }
 
-        // --- УТИЛИТА ЭКРАНИРОВАНИЯ ДЛЯ SRCDOC (КЛЮЧ К ИСЧЕЗНОВЕНИЮ ССЫЛОК GITHUB) ---
-        function escForSrcdoc(html){
-            return html.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        }
+        // --- УТИЛИТА ЭКРАНИРОВАНИЯ ДЛЯ SRCDOC ---
+        function escForSrcdoc(html){ return html.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
         // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА ---
         function generateGameCode() {
-            
-            // 1. Формируем чистый HTML код автономной игры (никаких ссылок вовне)
             let rootStyles = `:root {
                 --font-main: ${gameConfig.style.fontMain}; --font-title: ${gameConfig.style.fontTitle};
                 --text-color: ${gameConfig.style.textColor}; --title-color: ${gameConfig.style.titleColor};
@@ -987,19 +1152,19 @@ HTML
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         
         #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
-        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center;}
-        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; }
-        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color);}
-        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color);}
+        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center; position: relative; z-index: 2;}
+        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; position: relative; z-index: 2;}
+        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2;}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color); position: relative; z-index: 2;}
     </style>
 </head>
 <body>
     <div id="play-mode">
         <div id="start-screen">
-            <div id="drag-title-container" class="underlay-box" style="transform: translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScale});">
+            <div id="drag-title-container" class="underlay-box" style="transform: translate(${gameConfig.titleX}px, ${gameConfig.titleY}px) scale(${gameConfig.titleScaleX}, ${gameConfig.titleScaleY});">
                 <h1 class="game-title">${gameConfig.title}</h1>
             </div>
-            <div id="drag-team-container" class="team-selection underlay-box" style="transform: translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScale});">
+            <div id="drag-team-container" class="team-selection underlay-box" style="transform: translate(${gameConfig.teamX}px, ${gameConfig.teamY}px) scale(${gameConfig.teamScaleX}, ${gameConfig.teamScaleY});">
                 <label for="team-count" style="color:var(--text-color);">Количество команд:</label>
                 <select id="team-count">
                     <option value="2">2 команды</option><option value="3">3 команды</option><option value="4" selected>4 команды</option>
@@ -1034,24 +1199,110 @@ HTML
         const gameConfig = ${JSON.stringify(gameConfig)};
         let scores = []; let currentTeamIndex = 0; let questionsAnswered = 0; const totalQuestions = 25; 
         let activeCell = null; let currentPoints = 0; let currentActiveCol = 0; let currentActiveRow = 0;
+        
         let audioPlayers = {};
+        let AC = null;
+        function audioCtx() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); return AC; }
+
+        function beep({freq=440, dur=0.12, type="sine", vol=0.1, slide=0, when=0}) {
+            try {
+                const ctx = audioCtx(); const t0 = ctx.currentTime + when;
+                const o = ctx.createOscillator(); const g = ctx.createGain();
+                o.type = type; o.frequency.setValueAtTime(freq, t0);
+                if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, freq * slide), t0 + dur);
+                g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+                o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+            } catch(e) {}
+        }
+        function sfxFirework() {
+            try {
+                const ctx = audioCtx(); const t0 = ctx.currentTime;
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, t0); osc.frequency.exponentialRampToValueAtTime(50, t0 + 0.3);
+                gain.gain.setValueAtTime(0.5, t0); gain.gain.exponentialRampToValueAtTime(0.01, t0 + 0.4);
+                osc.connect(gain).connect(ctx.destination); osc.start(t0); osc.stop(t0 + 0.5);
+
+                const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain();
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(80, t0); osc2.frequency.exponentialRampToValueAtTime(20, t0 + 0.4);
+                gain2.gain.setValueAtTime(0.3, t0); gain2.gain.exponentialRampToValueAtTime(0.01, t0 + 0.5);
+                osc2.connect(gain2).connect(ctx.destination); osc2.start(t0); osc2.stop(t0 + 0.6);
+            } catch(e) {}
+        }
+        function sfxWinEpic() { 
+            beep({freq: 392, type: "square", dur: 0.15, vol: 0.15}); beep({freq: 523, type: "square", dur: 0.15, vol: 0.15, when: 0.15}); 
+            beep({freq: 659, type: "square", dur: 0.15, vol: 0.15, when: 0.30}); beep({freq: 783, type: "square", dur: 0.60, vol: 0.15, when: 0.45}); 
+        }
+        function sfxWinArcade() {
+            [261, 329, 392, 523, 659, 783, 1046].forEach((f, i) => { beep({freq: f, type: "square", dur: 0.1, vol: 0.1, when: i * 0.1}); });
+            beep({freq: 1046, type: "square", dur: 0.5, vol: 0.1, when: 0.7});
+        }
+        function sfxWinBell() {
+            beep({freq: 440, type: "sine", dur: 0.2, vol: 0.1}); beep({freq: 554, type: "sine", dur: 0.2, vol: 0.1, when: 0.2});
+            beep({freq: 659, type: "sine", dur: 0.2, vol: 0.1, when: 0.4}); beep({freq: 880, type: "sine", dur: 1.0, vol: 0.1, slide: 0.9, when: 0.6});
+        }
+        function playWinSound() {
+            if (gameConfig.winSoundStyle === 'arcade') sfxWinArcade(); else if (gameConfig.winSoundStyle === 'bell') sfxWinBell(); else sfxWinEpic();
+        }
+
+        function launchFireworks(mode, singleColor) {
+            if (!gameConfig.fireworksEnabled || mode === 'none') return;
+            const container = document.getElementById('play-mode') || document.body;
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed'; canvas.style.top = '0'; canvas.style.left = '0'; canvas.style.width = '100%'; canvas.style.height = '100%';
+            canvas.style.zIndex = '9999'; canvas.style.pointerEvents = 'none';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let particles = []; const multiColors = ['#FFD700', '#FFA500', '#00FFFF', '#FF0000', '#00FF00']; 
+            
+            function createBurst(x, y) {
+                sfxFirework();
+                const count = 100;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2; const speed = Math.random() * 5 + 2;
+                    const color = mode === 'multi' ? multiColors[Math.floor(Math.random() * multiColors.length)] : singleColor;
+                    particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, color: color, decay: Math.random() * 0.015 + 0.015 });
+                }
+            }
+
+            let burstsFired = 0; const totalBursts = 7;
+            function scheduleNextBurst() {
+                if (burstsFired >= totalBursts) return;
+                const x = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1); const y = Math.random() * (canvas.height * 0.5) + (canvas.height * 0.1);
+                createBurst(x, y); burstsFired++;
+                if (burstsFired < totalBursts) setTimeout(scheduleNextBurst, Math.random() * 300 + 200);
+            }
+            scheduleNextBurst();
+            
+            let animationId;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i]; if (p.alpha <= 0) continue;
+                    alive = true; p.vy += 0.05; p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
+                    ctx.globalAlpha = Math.max(0, p.alpha); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
+                }
+                if (!alive && burstsFired >= totalBursts) { cancelAnimationFrame(animationId); if (canvas.parentNode) canvas.parentNode.removeChild(canvas); } 
+                else { animationId = requestAnimationFrame(animate); }
+            }
+            animate();
+        }
 
         function playSound(type) { 
             if (audioPlayers[type]) { 
                 audioPlayers[type].currentTime = 0;
-                audioPlayers[type].play().catch(e => console.log("Audio block by browser:", e)); 
+                audioPlayers[type].play().catch(e => console.log("Audio block:", e)); 
             } 
         }
 
         function startGame() {
+            try { audioCtx().resume(); } catch(e) {}
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
             
-            // Жесткая загрузка всех звуков при стартовом клике для снятия блокировки
             audioPlayers['click'] = new Audio(gameConfig.sounds.click);
             audioPlayers['correct'] = new Audio(gameConfig.sounds.correct);
             audioPlayers['wrong'] = new Audio(gameConfig.sounds.wrong);
-            audioPlayers['fanfare'] = new Audio(gameConfig.sounds.fanfare);
             for(let key in audioPlayers) { audioPlayers[key].load(); }
 
             document.getElementById('start-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex';
@@ -1069,6 +1320,7 @@ HTML
                     const hex = gameConfig.colColors[col]; cell.style.setProperty('--col-color', hex); cell.style.setProperty('--col-color-transparent', hex + '33');
                     cell.onclick = function() {
                         if (this.classList.contains('disabled')) return;
+                        try { audioCtx().resume(); } catch(e) {}
                         playSound('click'); activeCell = this; currentPoints = parseInt(gameConfig.points[row]);
                         openRealModal(gameConfig.categories[col], currentPoints, hex, col, row);
                     };
@@ -1139,6 +1391,8 @@ HTML
             document.getElementById('modal-interactive-area').style.pointerEvents = 'none';
             const overlay = document.getElementById('result-overlay'); overlay.style.opacity = '1';
             let q = gameConfig.questions[currentActiveCol][currentActiveRow];
+            
+            try { audioCtx().resume(); } catch(e) {}
 
             if(isCorrect) {
                 playSound('correct'); overlay.style.background = 'var(--correct-color)'; overlay.innerHTML = '✓'; overlay.style.color = '#000';
@@ -1178,7 +1432,7 @@ HTML
             
             questionsAnswered++; 
             if (questionsAnswered >= totalQuestions) {
-                forceEndGame(); // Финал запускается прямо по клику на кнопку "Продолжить"
+                forceEndGame();
             } else { 
                 nextTurn(); 
             }
@@ -1191,13 +1445,20 @@ HTML
         }
 
         function forceEndGame() {
-            document.getElementById('game-screen').style.display = 'none'; document.getElementById('question-modal').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none'; document.getElementById('in-game-controls').style.display = 'none';
+            try { audioCtx().resume(); } catch(e) {} 
             
-            // Показываем финал и сразу играем звук, браузер не заблокирует, так как это прямое продолжение клика
+            playWinSound();
+            
+            document.getElementById('game-screen').style.display = 'none'; 
+            document.getElementById('question-modal').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none'; 
+            document.getElementById('in-game-controls').style.display = 'none';
+            
             document.getElementById('final-screen').style.display = 'flex'; 
-            playSound('fanfare');
+            document.getElementById('reward-image').src = gameConfig.cupImg;
             
+            launchFireworks(gameConfig.fireworkMode, gameConfig.fireworkColor);
+
             let results = [];
             for (let i = 0; i < gameConfig.teams; i++) { results.push({ id: i, name: \`Team \${i + 1}\`, score: scores[i], avatar: (!gameConfig.avatars[i].startsWith('http') && !gameConfig.avatars[i].startsWith('data:')) ? \`<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.5rem;">\${gameConfig.avatars[i]}</div>\` : \`<img src="\${gameConfig.avatars[i]}" style="width:100%;height:100%;object-fit:cover;">\` }); }
             results.sort((a, b) => b.score - a.score);
@@ -1219,8 +1480,6 @@ HTML
 </body>
 </html>`;
 
-            // 2. Генерируем Iframe на основе атрибута srcdoc. 
-            // Это 100% скрывает пути к GitHub. Весь HTML встраивается в iframe.
             const iframeDirectCode = `<iframe width="100%" height="100%" style="border:0;" allow="autoplay; fullscreen" srcdoc='${escForSrcdoc(fullHTML)}'></iframe>`;
 
             document.getElementById('out-html').value = fullHTML;
