@@ -155,7 +155,7 @@
         
         .modal-content { 
             background: var(--modal-box-bg); border: var(--neon-border) solid var(--col-color, #fff); border-radius: 15px; padding: min(40px, 4cqmin); 
-            width: 90%; max-width: 800px; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1;
+            width: 90%; max-width: 800px; max-height: 95vh; overflow-y: auto; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1;
         }
 
         .modal-header { font-family: var(--font-title); font-size: calc(1.2rem * var(--title-font-scale)); color: var(--points-color); margin-bottom: 15px; }
@@ -185,17 +185,20 @@
         .btn-next-arrow:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Экран 4: Финал */
-        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
-        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center; position: relative; z-index: 2;}
-        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; position: relative; z-index: 2;}
-        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2;}
-        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color); position: relative; z-index: 2;}
+        /* Экран 4: Финал (ИСПРАВЛЕНА ОБРЕЗКА) */
+        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); padding: 2vh 2vw; box-sizing: border-box; overflow: hidden;}
+        .final-title { font-family: var(--font-title); font-size: min(4rem, 8vh); color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 1vh; text-transform: uppercase; text-align: center; position: relative; z-index: 2; line-height: 1;}
+        .final-subtitle { font-size: min(1.5rem, 3vh); color: var(--text-color); margin-bottom: 2vh; position: relative; z-index: 2;}
+        #reward-image { max-width: 90vw; max-height: 35vh; border-radius: 15px; margin-bottom: 2vh; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2; object-fit: contain;}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 1vh 20px; border-radius: 10px; margin-bottom: 1vh; width: min(400px, 90vw); font-size: min(1.2rem, 2.5vh); color: var(--text-color); position: relative; z-index: 2;}
+        #leaderboard { max-height: 40vh; overflow-y: auto; scrollbar-width: none; width: min(420px, 95vw); display: flex; flex-direction: column; align-items: center; }
+        #leaderboard::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body id="body-tag">
 
     <div id="app-container">
+        <!-- ЛЕВАЯ ЧАСТЬ: РЕДАКТОР -->
         <div id="editor-ui">
             <div class="editor-header">
                 <img src="https://img.genially.com/67961b32a116fb001568a75e/673752a5-8d4d-40d1-9b5f-f04ebd91a27c.png" class="logo-img" alt="Logo">
@@ -212,6 +215,7 @@
             </div>
             
             <div class="editor-content">
+                <!-- Вкладка: Заставка -->
                 <div id="tab-start" class="ed-pane active">
                     <h3>Фон заставки</h3>
                     <div class="preset-grid" id="preset-grid-start"></div>
@@ -239,6 +243,7 @@
                     </div>
                 </div>
 
+                <!-- Вкладка: Игровое поле -->
                 <div id="tab-board" class="ed-pane">
                     <h3>Фон Игрового поля (Сетка)</h3>
                     <div class="form-group">
@@ -280,6 +285,7 @@
                     <div class="form-group" id="ed-categories-box"></div>
                 </div>
 
+                <!-- Вкладка: ВОПРОСЫ -->
                 <div id="tab-questions" class="ed-pane">
                     <h3>Редактор вопросов</h3>
                     <div class="smart-hint">
@@ -291,6 +297,7 @@
                     <div id="questions-editor-container"></div>
                 </div>
 
+                <!-- Вкладка: Медиа -->
                 <div id="tab-media" class="ed-pane">
                     <h3>Аватарки команд</h3>
                     <div class="form-group">
@@ -346,6 +353,7 @@
                     </div>
                 </div>
 
+                <!-- Вкладка: Шрифты -->
                 <div id="tab-design" class="ed-pane">
                     <h3>Настройка текста (Вопросы, Кнопки)</h3>
                     <div class="form-group">
@@ -389,6 +397,7 @@
                     </div>
                 </div>
 
+                <!-- Вкладка: ЭКСПОРТ ИГРЫ -->
                 <div id="tab-export" class="ed-pane">
                     
                     <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД ИГРЫ</button>
@@ -396,7 +405,7 @@
                     <div id="export-result" style="display:none;">
                         
                         <label style="display:block; margin-bottom:5px; font-weight:bold;">1. Код для вставки (Iframe):</label>
-                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте этот код для интеграции в Genially. Игра зашита внутри ссылки.</p>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте этот код для интеграции в Genially. Код надежно упакован в саму ссылку.</p>
                         <div class="flex-row" style="margin-bottom: 20px;">
                             <textarea id="out-iframe-direct" rows="4" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                             <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
@@ -418,6 +427,7 @@
             </div>
         </div>
 
+        <!-- ПРАВАЯ ЧАСТЬ: ПРЕДПРОСМОТР ИГРЫ -->
         <div id="preview-area">
             
             <div id="preview-tabs">
@@ -545,7 +555,6 @@
         let AC = null;
         function audioCtx() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); return AC; }
 
-        // --- ЛОГИКА ЗВУКА И САЛЮТА (WEB AUDIO API) ---
         function beep({freq=440, dur=0.12, type="sine", vol=0.1, slide=0, when=0}) {
             try {
                 const ctx = audioCtx(); const t0 = ctx.currentTime + when;
@@ -632,7 +641,6 @@
 
         function toggleFwColor() { document.getElementById('fw-color-wrap').style.display = document.getElementById('ed-fw-mode').value === 'single' ? 'block' : 'none'; }
 
-        // Инициализация
         window.onload = () => { initEditorMode(); };
 
         function initEditorMode() {
@@ -695,7 +703,7 @@
 
         function startGame() {
             if(!isTestMode) return;
-            try { audioCtx().resume(); } catch(e) {} // РАЗБЛОКИРОВКА АУДИОКОНТЕКСТА
+            try { audioCtx().resume(); } catch(e) {} 
             
             gameConfig.teams = parseInt(document.getElementById('team-count').value);
             scores = Array(gameConfig.teams).fill(0); currentTeamIndex = 0; questionsAnswered = 0;
@@ -909,7 +917,7 @@
                     const hex = gameConfig.colColors[col]; cell.style.setProperty('--col-color', hex); cell.style.setProperty('--col-color-transparent', hex + '33');
                     cell.onclick = function() {
                         if (this.classList.contains('disabled')) return;
-                        try { audioCtx().resume(); } catch(e) {} // РАЗБЛОКИРОВКА
+                        try { audioCtx().resume(); } catch(e) {} 
                         playSound('click'); activeCell = this; currentPoints = parseInt(gameConfig.points[row]);
                         openRealModal(gameConfig.categories[col], currentPoints, hex, col, row);
                     };
@@ -1069,10 +1077,7 @@
             }
         }
 
-        // --- УТИЛИТА ЭКРАНИРОВАНИЯ ДЛЯ SRCDOC ---
-        function escForSrcdoc(html){ return html.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-        // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА ---
+        // --- ГЕНЕРАЦИЯ ФИНАЛЬНОГО КОДА С ИСПОЛЬЗОВАНИЕМ DATA:BASE64 URI ---
         function generateGameCode() {
             let rootStyles = `:root {
                 --font-main: ${gameConfig.style.fontMain}; --font-title: ${gameConfig.style.fontTitle};
@@ -1130,7 +1135,7 @@
 
         #question-modal { position: absolute; inset: 0; display: none; justify-content: center; align-items: center; z-index: 200; background-image: var(--bg-modal-img); background-size: cover; background-position: center; background-repeat: no-repeat; flex-direction: column; }
         #question-modal::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,var(--modal-overlay-opacity)); z-index: 0; }
-        .modal-content { background: var(--modal-box-bg); border: var(--neon-border) solid var(--col-color, #fff); border-radius: 15px; padding: min(40px, 4cqmin); width: 90%; max-width: 800px; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1; }
+        .modal-content { background: var(--modal-box-bg); border: var(--neon-border) solid var(--col-color, #fff); border-radius: 15px; padding: min(40px, 4cqmin); width: 90%; max-width: 800px; max-height: 95vh; overflow-y: auto; text-align: center; box-shadow: 0 0 30px var(--col-color, #0ff); position: relative; z-index: 1; }
         .modal-header { font-family: var(--font-title); font-size: calc(1.2rem * var(--title-font-scale)); color: var(--points-color); margin-bottom: 15px; }
         .modal-task-text { font-size: 1.5em; margin-bottom: 20px; font-weight: 600; text-shadow: 1px 1px 3px #000; color: var(--text-color);}
         .media-container img { max-width: 100%; max-height: 35vh; max-height: 35cqh; border-radius: 10px; margin-bottom: 15px; border: 2px solid #555; }
@@ -1152,11 +1157,14 @@
         .btn-next-arrow:hover { background: #0ff; color: #000; box-shadow: 0 0 30px #0ff; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         
-        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); }
-        .final-title { font-family: var(--font-title); font-size: 4rem; color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 20px; text-transform: uppercase; text-align: center; position: relative; z-index: 2;}
-        .final-subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 20px; position: relative; z-index: 2;}
-        #reward-image { max-width: 250px; max-height: 250px; border-radius: 15px; margin-bottom: 30px; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2;}
-        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; margin-bottom: 10px; width: 400px; font-size: 1.2rem; color: var(--text-color); position: relative; z-index: 2;}
+        /* Экран 4: Финал (ИСПРАВЛЕНА ОБРЕЗКА) */
+        #final-screen { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 300; background: var(--bg-game-board); padding: 2vh 2vw; box-sizing: border-box; overflow: hidden;}
+        .final-title { font-family: var(--font-title); font-size: min(4rem, 8vh); color: var(--points-color); text-shadow: 0 0 var(--neon-intensity) var(--points-color); margin-bottom: 1vh; text-transform: uppercase; text-align: center; position: relative; z-index: 2; line-height: 1;}
+        .final-subtitle { font-size: min(1.5rem, 3vh); color: var(--text-color); margin-bottom: 2vh; position: relative; z-index: 2;}
+        #reward-image { max-width: 90vw; max-height: 35vh; border-radius: 15px; margin-bottom: 2vh; border: 2px solid var(--points-color); box-shadow: 0 0 20px var(--points-color); position: relative; z-index: 2; object-fit: contain;}
+        .leaderboard-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 1vh 20px; border-radius: 10px; margin-bottom: 1vh; width: min(400px, 90vw); font-size: min(1.2rem, 2.5vh); color: var(--text-color); position: relative; z-index: 2;}
+        #leaderboard { max-height: 40vh; overflow-y: auto; scrollbar-width: none; width: min(420px, 95vw); display: flex; flex-direction: column; align-items: center; }
+        #leaderboard::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -1229,21 +1237,10 @@
                 osc2.connect(gain2).connect(ctx.destination); osc2.start(t0); osc2.stop(t0 + 0.6);
             } catch(e) {}
         }
-        function sfxWinEpic() { 
-            beep({freq: 392, type: "square", dur: 0.15, vol: 0.15}); beep({freq: 523, type: "square", dur: 0.15, vol: 0.15, when: 0.15}); 
-            beep({freq: 659, type: "square", dur: 0.15, vol: 0.15, when: 0.30}); beep({freq: 783, type: "square", dur: 0.60, vol: 0.15, when: 0.45}); 
-        }
-        function sfxWinArcade() {
-            [261, 329, 392, 523, 659, 783, 1046].forEach((f, i) => { beep({freq: f, type: "square", dur: 0.1, vol: 0.1, when: i * 0.1}); });
-            beep({freq: 1046, type: "square", dur: 0.5, vol: 0.1, when: 0.7});
-        }
-        function sfxWinBell() {
-            beep({freq: 440, type: "sine", dur: 0.2, vol: 0.1}); beep({freq: 554, type: "sine", dur: 0.2, vol: 0.1, when: 0.2});
-            beep({freq: 659, type: "sine", dur: 0.2, vol: 0.1, when: 0.4}); beep({freq: 880, type: "sine", dur: 1.0, vol: 0.1, slide: 0.9, when: 0.6});
-        }
-        function playWinSound() {
-            if (gameConfig.winSoundStyle === 'arcade') sfxWinArcade(); else if (gameConfig.winSoundStyle === 'bell') sfxWinBell(); else sfxWinEpic();
-        }
+        function sfxWinEpic() { beep({freq: 392, type: "square", dur: 0.15, vol: 0.15}); beep({freq: 523, type: "square", dur: 0.15, vol: 0.15, when: 0.15}); beep({freq: 659, type: "square", dur: 0.15, vol: 0.15, when: 0.30}); beep({freq: 783, type: "square", dur: 0.60, vol: 0.15, when: 0.45}); }
+        function sfxWinArcade() { [261, 329, 392, 523, 659, 783, 1046].forEach((f, i) => { beep({freq: f, type: "square", dur: 0.1, vol: 0.1, when: i * 0.1}); }); beep({freq: 1046, type: "square", dur: 0.5, vol: 0.1, when: 0.7}); }
+        function sfxWinBell() { beep({freq: 440, type: "sine", dur: 0.2, vol: 0.1}); beep({freq: 554, type: "sine", dur: 0.2, vol: 0.1, when: 0.2}); beep({freq: 659, type: "sine", dur: 0.2, vol: 0.1, when: 0.4}); beep({freq: 880, type: "sine", dur: 1.0, vol: 0.1, slide: 0.9, when: 0.6}); }
+        function playWinSound() { if (gameConfig.winSoundStyle === 'arcade') sfxWinArcade(); else if (gameConfig.winSoundStyle === 'bell') sfxWinBell(); else sfxWinEpic(); }
 
         function launchFireworks(mode, singleColor) {
             if (!gameConfig.fireworksEnabled || mode === 'none') return;
@@ -1481,7 +1478,9 @@
 </body>
 </html>`;
 
-            const iframeDirectCode = `<iframe width="100%" height="100%" style="border:0;" allow="autoplay; fullscreen" srcdoc='${escForSrcdoc(fullHTML)}'></iframe>`;
+            // Упаковка в Base64 для надежного хранения данных в ссылке фрейма
+            const base64HTML = btoa(unescape(encodeURIComponent(fullHTML)));
+            const iframeDirectCode = `<iframe width="100%" height="100%" style="border:0;" allow="autoplay; fullscreen" src="data:text/html;base64,${base64HTML}"></iframe>`;
 
             document.getElementById('out-html').value = fullHTML;
             document.getElementById('out-iframe-direct').value = iframeDirectCode;
