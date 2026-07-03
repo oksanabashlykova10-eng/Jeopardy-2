@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeopardy Game Editor by English Bootcamp</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&family=MedievalSharp&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -226,7 +226,6 @@
 <body id="body-tag">
 
     <div id="app-container">
-        <!-- ЛЕВАЯ ЧАСТЬ: РЕДАКТОР -->
         <div id="editor-ui">
             <div class="editor-header">
                 <img src="https://img.genially.com/67961b32a116fb001568a75e/673752a5-8d4d-40d1-9b5f-f04ebd91a27c.png" class="logo-img" alt="Logo">
@@ -244,7 +243,6 @@
             </div>
             
             <div class="editor-content">
-                <!-- Вкладка: Заставка -->
                 <div id="tab-start" class="ed-pane active">
                     <h3>Фон заставки</h3>
                     <div class="preset-grid" id="preset-grid-start"></div>
@@ -266,6 +264,8 @@
                             <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Узкий)</option>
                             <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Современный)</option>
                             <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
+                            <option value="'MedievalSharp', cursive" style="font-family: 'MedievalSharp', cursive;">MedievalSharp (Средневековье)</option>
+                            <option value="Papyrus, fantasy" style="font-family: Papyrus, fantasy;">Ancient Maya (Папирус)</option>
                         </select>
                         <div class="flex-row">
                             <label style="width:50%;">Цвет шрифта:</label>
@@ -298,7 +298,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка: Игровое поле -->
                 <div id="tab-board" class="ed-pane">
                     <h3>Фон Игрового поля (Сетка)</h3>
                     <div class="form-group">
@@ -340,7 +339,6 @@
                     <div class="form-group" id="ed-categories-box"></div>
                 </div>
 
-                <!-- Вкладка: ВОПРОСЫ -->
                 <div id="tab-questions" class="ed-pane">
                     <h3>Редактор вопросов</h3>
                     <div class="smart-hint">
@@ -352,7 +350,6 @@
                     <div id="questions-editor-container"></div>
                 </div>
 
-                <!-- Вкладка: Медиа -->
                 <div id="tab-media" class="ed-pane">
                     <h3>Аватарки команд</h3>
                     <div class="form-group">
@@ -398,7 +395,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка: Экран Финала -->
                 <div id="tab-final-settings" class="ed-pane">
                     <div class="smart-hint" style="background:#fff3e0; border-left-color:#ff9800; color:#e65100;">
                         <b>Важно:</b> Чтобы настроить размеры и позицию элементов, кликните на кнопку <b>«Экран финала»</b> в правой панели (визуал) и двигайте элементы мышкой!
@@ -418,6 +414,8 @@
                                 <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Узкий)</option>
                                 <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Современный)</option>
                                 <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
+                                <option value="'MedievalSharp', cursive" style="font-family: 'MedievalSharp', cursive;">MedievalSharp (Средневековье)</option>
+                                <option value="Papyrus, fantasy" style="font-family: Papyrus, fantasy;">Ancient Maya (Папирус)</option>
                             </select>
                             <input type="color" style="width:30%;" value="#ffd700" onchange="gameConfig.style.finTitleColor = this.value; applyConfigStyles();">
                         </div>
@@ -432,6 +430,7 @@
                                 <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
                                 <option value="'Courier Prime', monospace" style="font-family: 'Courier Prime', monospace;">Courier Prime (Печатный)</option>
                                 <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Маркер)</option>
+                                <option value="'MedievalSharp', cursive" style="font-family: 'MedievalSharp', cursive;">MedievalSharp</option>
                             </select>
                             <input type="color" style="width:30%;" value="#ffffff" onchange="gameConfig.style.finSubColor = this.value; applyConfigStyles();">
                         </div>
@@ -450,7 +449,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка: Шрифты вопроса -->
                 <div id="tab-design" class="ed-pane">
                     <h3>Настройка текста (Окно вопроса)</h3>
                     <div class="form-group">
@@ -463,6 +461,8 @@
                             <option value="'Courier Prime', monospace" style="font-family: 'Courier Prime', monospace;">Courier Prime (Печатный)</option>
                             <option value="'Playfair Display', serif" style="font-family: 'Playfair Display', serif;">Playfair Display (Элегантный)</option>
                             <option value="'Caveat', cursive" style="font-family: 'Caveat', cursive;">Caveat (Маркер)</option>
+                            <option value="'MedievalSharp', cursive" style="font-family: 'MedievalSharp', cursive;">MedievalSharp</option>
+                            <option value="Papyrus, fantasy" style="font-family: Papyrus, fantasy;">Ancient Maya (Папирус)</option>
                         </select>
                         <div class="flex-row" style="margin-top:10px;">
                             <label style="width:40%;">Цвет текста:</label><input type="color" id="ed-text-color" value="#ffffff" onchange="updateFonts()">
@@ -482,6 +482,8 @@
                             <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Узкий)</option>
                             <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Современный)</option>
                             <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive;">Comic Neue (Игровой)</option>
+                            <option value="'MedievalSharp', cursive" style="font-family: 'MedievalSharp', cursive;">MedievalSharp</option>
+                            <option value="Papyrus, fantasy" style="font-family: Papyrus, fantasy;">Ancient Maya (Папирус)</option>
                         </select>
                         <div class="flex-row" style="margin-top:10px;">
                             <label style="width:40%;">Цвет шрифта:</label><input type="color" id="ed-title-color" value="#ffffff" onchange="updateFonts()">
@@ -492,22 +494,21 @@
                     </div>
                 </div>
 
-                <!-- Вкладка: ЭКСПОРТ ИГРЫ -->
                 <div id="tab-export" class="ed-pane">
                     
-                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД ИГРЫ</button>
+                    <button class="btn-start" style="width:100%; font-size:1rem; background:#00bcd4; border-color:#00bcd4; color:#000; margin-bottom: 20px;" onclick="generateGameCode()">СГЕНЕРИРОВАТЬ КОД ИГРЫ (PRO)</button>
                     
                     <div id="export-result" style="display:none;">
                         
-                        <label style="display:block; margin-bottom:5px; font-weight:bold;">1. Код для вставки (Iframe):</label>
-                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Используйте этот код для интеграции в Genially. Код надежно упакован в саму ссылку.</p>
+                        <label style="display:block; margin-bottom:5px; font-weight:bold;">1. Защищенный Iframe (Для Genially):</label>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Умный код с обходом защиты Genially. Работают аудио-паузы и защита кода.</p>
                         <div class="flex-row" style="margin-bottom: 20px;">
                             <textarea id="out-iframe-direct" rows="4" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                             <button onclick="copyCode('out-iframe-direct', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
                         </div>
                         
                         <label style="display:block; margin-bottom:5px; font-weight:bold;">2. Чистый HTML-код (Для сайта):</label>
-                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Полный исходный код игры в одном файле.</p>
+                        <p style="font-size:0.75rem; color:#666; margin-bottom:5px;">Полный исходный код игры (Base64) в одном файле.</p>
                         <div class="flex-row">
                             <textarea id="out-html" rows="4" readonly style="font-family:monospace; background:#fff; width: 75%; padding:8px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
                             <button onclick="copyCode('out-html', this)" style="padding:10px; cursor:pointer; width: 25%; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; height: 100%;">Копировать</button>
@@ -522,7 +523,6 @@
             </div>
         </div>
 
-        <!-- ПРАВАЯ ЧАСТЬ: ПРЕДПРОСМОТР ИГРЫ -->
         <div id="preview-area">
             
             <div id="preview-tabs">
@@ -568,7 +568,6 @@
                     </div>
                 </div>
 
-                <!-- ПЛАВАЮЩИЙ ЭКРАН ФИНАЛА -->
                 <div id="final-screen">
                     
                     <div id="drag-final-title" class="drag-container underlay-box">
@@ -1117,7 +1116,7 @@
 
             if(q.hasMedia && q.mediaUrl.trim() !== '') {
                 const mediaCont = document.createElement('div'); mediaCont.className = 'media-container';
-                if(q.mediaType === 'image') mediaCont.innerHTML = `<img src="${q.mediaUrl}">`; else if(q.mediaType === 'audio') mediaCont.innerHTML = `<audio controls src="${q.mediaUrl}" autoplay></audio>`;
+                if(q.mediaType === 'image') mediaCont.innerHTML = `<img src="${q.mediaUrl}">`; else if(q.mediaType === 'audio') mediaCont.innerHTML = `<audio controls id="active-audio-elem" src="${q.mediaUrl}" autoplay></audio>`;
                 area.appendChild(mediaCont);
             }
 
@@ -1187,6 +1186,11 @@
                     });
                 }
             }
+            
+            // Останавливаем аудио, если оно играло
+            const audioEl = document.getElementById('active-audio-elem');
+            if(audioEl) { audioEl.pause(); }
+
             let nextBtn = document.createElement('button'); nextBtn.className = 'btn-next-arrow'; nextBtn.innerHTML = 'CONTINUE ➔'; nextBtn.onclick = closeQuestionModal;
             document.getElementById('modal-content-box').appendChild(nextBtn);
         }
@@ -1268,6 +1272,9 @@
                 --modal-box-bg: ${gameConfig.style.modalBoxBg}; --underlay-bg: ${gameConfig.style.underlayBg};
                 --underlay-neon: ${gameConfig.style.underlayNeon};
             }`;
+            
+            // Безопасное формирование закрывающего тега script, чтобы не ломать парсер редактора
+            const scriptClose = "<" + "/script>";
 
             let fullHTML = `<!DOCTYPE html>
 <html lang="en">
@@ -1275,11 +1282,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game by English Bootcamp</title>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@600&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Exo+2:wght@400;700&family=Montserrat:wght@600&family=Orbitron:wght@500;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto:wght@500&family=MedievalSharp&display=swap" rel="stylesheet">
     <style>
         ${rootStyles}
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #111; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Roboto', sans-serif; background: #111; user-select: none; }
         .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
@@ -1544,7 +1551,7 @@
 
             if(q.hasMedia && q.mediaUrl.trim() !== '') {
                 const mediaCont = document.createElement('div'); mediaCont.className = 'media-container';
-                if(q.mediaType === 'image') mediaCont.innerHTML = \`<img src="\${q.mediaUrl}">\`; else if(q.mediaType === 'audio') mediaCont.innerHTML = \`<audio controls src="\${q.mediaUrl}" autoplay></audio>\`;
+                if(q.mediaType === 'image') mediaCont.innerHTML = \`<img src="\${q.mediaUrl}">\`; else if(q.mediaType === 'audio') mediaCont.innerHTML = \`<audio controls id="active-audio-elem" src="\${q.mediaUrl}" autoplay></audio>\`;
                 area.appendChild(mediaCont);
             }
 
@@ -1614,6 +1621,10 @@
                     });
                 }
             }
+
+            const audioEl = document.getElementById('active-audio-elem');
+            if(audioEl) { audioEl.pause(); }
+
             let nextBtn = document.createElement('button'); nextBtn.className = 'btn-next-arrow'; nextBtn.innerHTML = 'CONTINUE ➔'; nextBtn.onclick = closeQuestionModal;
             document.getElementById('modal-content-box').appendChild(nextBtn);
         }
@@ -1670,28 +1681,50 @@
             results.forEach((team, index) => { lbContainer.innerHTML += \`<div class="leaderboard-row"><div>#\${index + 1}</div><div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; overflow:hidden;">\${team.avatar}</div> \${team.name}</div><div style="color:var(--points-color); font-weight:bold;">\${team.score}</div></div>\`; });
         }
 
-        // Защита
+        // Genially Sensor: Пауза аудио, если слайд скрыт
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                const audioEl = document.getElementById('active-audio-elem');
+                if (audioEl) audioEl.pause();
+            }
+        });
+        if ('IntersectionObserver' in window) {
+            let observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        const audioEl = document.getElementById('active-audio-elem');
+                        if (audioEl) audioEl.pause();
+                    }
+                });
+            });
+            observer.observe(document.body);
+        }
+
+        // Защита интеллектуальной собственности
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
-            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
+            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
         });
-    <\/script>
+    ` + scriptClose + `
 </body>
 </html>`;
 
             // Упаковка в Base64
             const base64HTML = btoa(unescape(encodeURIComponent(fullHTML)));
-            const iframeDirectCode = `<iframe width="100%" height="100%" style="border:0;" allow="autoplay; fullscreen" src="data:text/html;base64,${base64HTML}"></iframe>`;
+            const uniqueId = 'game-box-' + Date.now();
+            
+            // Специальный скрипт-инжектор. Закрывающий тег формируем через конкатенацию, чтобы редактор не ломался.
+            const iframeDirectCode = `<div id="${uniqueId}" style="width:100%; height:100%; overflow:hidden;"></div>\n<script>\n  (function(){\n    var ifr = document.createElement('iframe');\n    ifr.style.border = '0'; ifr.style.width = '100%'; ifr.style.height = '100%';\n    ifr.allow = 'autoplay; fullscreen';\n    ifr.src = 'data:text/html;base64,${base64HTML}';\n    document.getElementById('${uniqueId}').appendChild(ifr);\n  })();\n<` + `/script>`;
 
             document.getElementById('out-html').value = fullHTML;
             document.getElementById('out-iframe-direct').value = iframeDirectCode;
             document.getElementById('export-result').style.display = 'block';
         }
 
-        // Защита
+        // Защита для самого редактора
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
-            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
+            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) { e.preventDefault(); return false; }
         });
 
     </script>
